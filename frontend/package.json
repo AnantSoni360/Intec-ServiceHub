@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "start": "vite preview --host"
+    "start": "vite preview --host --port $PORT"
   },
   "dependencies": {
     "@react-oauth/google": "^0.13.5",
