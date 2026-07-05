@@ -51,12 +51,14 @@ const Dashboard = ({ user }) => {
         const ticketRes = await fetch(user.role === 'Admin' || user.role === 'Engineer' 
           ? `${import.meta.env.VITE_API_URL}/tickets` 
           : `${import.meta.env.VITE_API_URL}/tickets/user/${user.id}`, fetchOptions);
-        const tickets = await ticketRes.json();
+        const ticketData = await ticketRes.json();
+        const tickets = ticketData.data || ticketData || [];
         
         const assetRes = await fetch(user.role === 'Admin' 
           ? `${import.meta.env.VITE_API_URL}/assets` 
           : `${import.meta.env.VITE_API_URL}/assets/user/${user.id}`, fetchOptions);
-        const assets = await assetRes.json();
+        const assetData = await assetRes.json();
+        const assets = assetData.data || assetData || [];
 
         setStats({
           tickets: tickets.length,
