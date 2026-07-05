@@ -54,6 +54,7 @@ if (!process.env.MONGO_URI || process.env.MONGO_URI.includes('<db_password>')) {
   process.exit(1);
 }
 
+mongoose.set('sanitizeFilter', true);
 mongoose.connect(process.env.MONGO_URI, { family: 4 })
   .then(() => logger.info('Connected to MongoDB'))
   .catch(err => {
