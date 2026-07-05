@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Asset = require('../models/Asset');
 const authMiddleware = require('../middleware/authMiddleware');
+const requireRole = require('../middleware/roleMiddleware');
 
 router.use(authMiddleware);
 
@@ -16,10 +17,34 @@ const mapAsset = (a) => ({
 });
 
 // Get all assets (Admin/Engineer)
-router.get('/', async (req, res) => {
+router.get('/', requireRole('Admin', 'Engineer'), async (req, res) => {
   try {
-    const assets = await Asset.find({}).sort({ createdAt: -1 });
-    res.json(assets.map(mapAsset));
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+    const skip = (page - 1) * limit;
+
+    const query = {};
+    if (req.query.status && req.query.status !== 'All') query.status = req.query.status;
+    if (req.query.type && req.query.type !== 'All') query.type = req.query.type;
+    if (req.query.search) {
+      query.$or = [
+        { name: { $regex: req.query.search, $options: 'i' } },
+        { serialNumber: { $regex: req.query.search, $options: 'i' } }
+      ];
+    }
+
+    let sortOption = { createdAt: -1 };
+    if (req.query.sortBy === 'Oldest First') sortOption = { createdAt: 1 };
+    
+    const totalCount = await Asset.countDocuments(query);
+
+    let assetsQuery = Asset.find(query).sort(sortOption);
+    if (!req.query.export) {
+      assetsQuery = assetsQuery.skip(skip).limit(limit);
+    }
+    const assets = await assetsQuery.exec();
+    
+    res.json({ data: assets.map(mapAsset), totalCount });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -28,8 +53,37 @@ router.get('/', async (req, res) => {
 // Get assets for specific user
 router.get('/user/:userId', async (req, res) => {
   try {
-    const assets = await Asset.find({ assignedTo: req.params.userId }).sort({ createdAt: -1 });
-    res.json(assets.map(mapAsset));
+    // Ownership check
+    if (req.user.id !== req.params.userId && !['Admin', 'Engineer'].includes(req.user.role)) {
+      return res.status(403).json({ message: 'Access Denied: Cannot view other users\' assets' });
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+    const skip = (page - 1) * limit;
+
+    const query = { assignedTo: req.params.userId };
+    if (req.query.status && req.query.status !== 'All') query.status = req.query.status;
+    if (req.query.type && req.query.type !== 'All') query.type = req.query.type;
+    if (req.query.search) {
+      query.$or = [
+        { name: { $regex: req.query.search, $options: 'i' } },
+        { serialNumber: { $regex: req.query.search, $options: 'i' } }
+      ];
+    }
+
+    let sortOption = { createdAt: -1 };
+    if (req.query.sortBy === 'Oldest First') sortOption = { createdAt: 1 };
+    
+    const totalCount = await Asset.countDocuments(query);
+
+    let assetsQuery = Asset.find(query).sort(sortOption);
+    if (!req.query.export) {
+      assetsQuery = assetsQuery.skip(skip).limit(limit);
+    }
+    const assets = await assetsQuery.exec();
+    
+    res.json({ data: assets.map(mapAsset), totalCount });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -54,7 +108,7 @@ router.post('/', async (req, res) => {
 });
 
 // Bulk update assets
-router.post('/bulk/update', async (req, res) => {
+router.post('/bulk/update', requireRole('Admin', 'Engineer'), async (req, res) => {
   try {
     const { assetIds, updateData } = req.body;
     if (!assetIds || !Array.isArray(assetIds) || assetIds.length === 0) {
@@ -92,7 +146,7 @@ router.post('/bulk/update', async (req, res) => {
 });
 
 // Bulk delete assets
-router.post('/bulk/delete', async (req, res) => {
+router.post('/bulk/delete', requireRole('Admin'), async (req, res) => {
   try {
     const { assetIds } = req.body;
     if (!assetIds || !Array.isArray(assetIds) || assetIds.length === 0) {

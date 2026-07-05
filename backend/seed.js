@@ -8,6 +8,11 @@ const Asset = require('./models/Asset');
 
 async function seedDatabase() {
   try {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('FATAL ERROR: Refusing to run seed script in production environment. This would wipe all data.');
+      process.exit(1);
+    }
+
     if (!process.env.MONGO_URI || process.env.MONGO_URI.includes('<db_password>')) {
       console.error('ERROR: Please update your .env file with your actual MongoDB password!');
       process.exit(1);

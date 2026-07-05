@@ -9,6 +9,7 @@ import Tickets from './pages/Tickets';
 import Assets from './pages/Assets';
 import AdminUsers from './pages/AdminUsers';
 import Settings from './pages/Settings';
+import KnowledgeBase from './pages/KnowledgeBase';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import CommandCenterLoader from './components/CommandCenterLoader';
@@ -96,6 +97,7 @@ function App() {
                     <Routes>
                       <Route path="/dashboard" element={<PageWrapper><Dashboard user={user} /></PageWrapper>} />
                       <Route path="/tickets" element={<PageWrapper><Tickets user={user} /></PageWrapper>} />
+                      <Route path="/knowledge" element={<PageWrapper><KnowledgeBase user={user} /></PageWrapper>} />
                       <Route path="/assets" element={<PageWrapper><Assets user={user} /></PageWrapper>} />
                       <Route path="/users" element={<PageWrapper><AdminUsers user={user} /></PageWrapper>} />
                       <Route path="/settings" element={<PageWrapper><Settings user={user} /></PageWrapper>} />

@@ -101,4 +101,64 @@ router.post('/change-password', authMiddleware, async (req, res) => {
   }
 });
 
+// Add CRUD for users (Admin only)
+const requireRole = require('../middleware/roleMiddleware');
+
+// Create user
+router.post('/users', authMiddleware, requireRole('Admin'), async (req, res) => {
+  try {
+    const { name, email, role, department } = req.body;
+    const bcrypt = require('bcryptjs');
+    
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(400).json({ message: 'User already exists' });
+
+    const password = await bcrypt.hash('Changeme123!', 10);
+    const user = new User({ name, email, password, role, department });
+    await user.save();
+
+    res.status(201).json({ id: user._id, name: user.name, email: user.email, role: user.role, department: user.department });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Update user
+router.put('/users/:id', authMiddleware, requireRole('Admin'), async (req, res) => {
+  try {
+    const { name, email, role, department } = req.body;
+    const user = await User.findByIdAndUpdate(req.params.id, { name, email, role, department }, { new: true });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ id: user._id, name: user.name, email: user.email, role: user.role, department: user.department });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Delete user
+router.delete('/users/:id', authMiddleware, requireRole('Admin'), async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Reset password (Admin only)
+router.post('/users/:id/reset-password', authMiddleware, requireRole('Admin'), async (req, res) => {
+  try {
+    const bcrypt = require('bcryptjs');
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.password = await bcrypt.hash('Changeme123!', 10);
+    await user.save();
+    res.json({ message: 'Password reset to default (Changeme123!) successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;

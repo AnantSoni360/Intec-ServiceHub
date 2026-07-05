@@ -3,37 +3,61 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const rateLimit = require('express-rate-limit');
+const pino = require('pino');
+const pinoHttp = require('pino-http');
 
 const app = express();
 
+const logger = pino({
+  level: process.env.LOG_LEVEL || 'info',
+});
+app.use(pinoHttp({ logger }));
+
 // Security: Restrict CORS
+if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
+  logger.fatal('FATAL ERROR: FRONTEND_URL is not defined in production');
+  process.exit(1);
+}
+
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: '*',
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
 app.use(express.json());
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Security: Rate Limiting
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per window
-  message: 'Too many requests from this IP, please try again after 15 minutes',
+  message: { success: false, message: 'Too many requests from this IP, please try again after 15 minutes' },
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 requests per window for login
+  message: { success: false, message: 'Too many login attempts from this IP, please try again after 15 minutes' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 app.use('/api/', apiLimiter);
+app.use('/api/auth/login', loginLimiter);
 
 // Connect to MongoDB
 if (!process.env.MONGO_URI || process.env.MONGO_URI.includes('<db_password>')) {
-  console.error('FATAL ERROR: Valid MONGO_URI is not defined in .env');
+  logger.fatal('FATAL ERROR: Valid MONGO_URI is not defined in .env');
   process.exit(1);
 }
 
 mongoose.connect(process.env.MONGO_URI, { family: 4 })
-  .then(() => console.log('Connected to MongoDB'))
+  .then(() => logger.info('Connected to MongoDB'))
   .catch(err => {
-    console.error('Could not connect to MongoDB:', err);
+    logger.error('Could not connect to MongoDB:', err);
     process.exit(1);
   });
 
@@ -46,5 +70,11 @@ app.use('/api/auth', authRoutes);
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/assets', assetRoutes);
 
+// Global error handler for Pino structured logging
+app.use((err, req, res, next) => {
+  req.log.error(err);
+  res.status(500).json({ message: 'Server Error' });
+});
+
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => logger.info(`Server running on port ${PORT}`));

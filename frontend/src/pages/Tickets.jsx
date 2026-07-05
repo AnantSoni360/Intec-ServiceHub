@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Plus, MoreVertical, Edit, UserPlus, FileText, CheckCircle2 } from 'lucide-react';
+import { Search, Plus, MoreVertical, Edit, UserPlus, FileText, CheckCircle2, Download, Paperclip, AlertTriangle } from 'lucide-react';
 import TicketSidePanel from '../components/TicketSidePanel';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const Tickets = ({ user }) => {
   const [tickets, setTickets] = useState([]);
@@ -17,7 +19,9 @@ const Tickets = ({ user }) => {
   
   // Modals & Panels
   const [showAddModal, setShowAddModal] = useState(false);
-  const [newTicket, setNewTicket] = useState({ title: '', description: '', priority: 'Medium', category: 'Other' });
+  const [newTicket, setNewTicket] = useState({ title: '', description: '', priority: 'Medium', category: 'Other', assetId: '' });
+  const [attachments, setAttachments] = useState(null);
+  const [userAssets, setUserAssets] = useState([]);
   
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [activeMenuId, setActiveMenuId] = useState(null);
@@ -26,64 +30,35 @@ const Tickets = ({ user }) => {
   
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 50;
 
   useEffect(() => {
     fetchTickets();
+  }, [user, searchQuery, statusFilter, priorityFilter, categoryFilter, sortBy, currentPage]);
+
+  useEffect(() => {
     if (user.role === 'Admin' || user.role === 'Engineer') {
       fetchUsers();
     }
   }, [user]);
 
   useEffect(() => {
-    let result = Array.isArray(tickets) ? [...tickets] : [];
-
-    if (statusFilter !== 'All') {
-      result = result.filter(t => t.status === statusFilter);
+    if (showAddModal) {
+      const fetchAssets = async () => {
+        try {
+          const token = localStorage.getItem('token');
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/assets/user/${user.id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const data = await res.json();
+          if (data && Array.isArray(data.data)) setUserAssets(data.data);
+          else if (Array.isArray(data)) setUserAssets(data);
+        } catch (err) {}
+      };
+      fetchAssets();
     }
-
-    if (priorityFilter !== 'All') {
-      result = result.filter(t => t.priority === priorityFilter);
-    }
-
-    if (categoryFilter !== 'All') {
-      result = result.filter(t => t.category === categoryFilter);
-    }
-
-    if (searchQuery.trim() !== '') {
-      const lowerQ = searchQuery.toLowerCase();
-      result = result.filter(t => {
-        const titleMatch = t.title ? String(t.title).toLowerCase().includes(lowerQ) : false;
-        const formattedId = `tkt-${t.id.substring(t.id.length - 6).toLowerCase()}`;
-        const idMatch = formattedId.includes(lowerQ) || (t.id ? String(t.id).toLowerCase().includes(lowerQ) : false);
-        const descMatch = t.description ? String(t.description).toLowerCase().includes(lowerQ) : false;
-        
-        let userMatch = false;
-        if (users.length > 0) {
-          const requester = users.find(u => u.id === t.requestedBy);
-          const assignee = users.find(u => u.id === t.assignedTo);
-          if (requester && String(requester.name).toLowerCase().includes(lowerQ)) userMatch = true;
-          if (assignee && String(assignee.name).toLowerCase().includes(lowerQ)) userMatch = true;
-        }
-
-        return titleMatch || idMatch || descMatch || userMatch;
-      });
-    }
-
-    result.sort((a, b) => {
-      if (sortBy === 'Name (A-Z)') return (a.title || '').localeCompare(b.title || '');
-      if (sortBy === 'Name (Z-A)') return (b.title || '').localeCompare(a.title || '');
-      return 0;
-    });
-
-    if (sortBy === 'Oldest') {
-      result.reverse();
-    }
-
-    setFilteredTickets(result);
-    setCurrentPage(1);
-    setSelectedTicketIds([]); // Reset selection on filter change
-  }, [searchQuery, statusFilter, priorityFilter, categoryFilter, sortBy, tickets, users]);
+  }, [showAddModal, user.id]);
 
   // Click outside to close menus
   useEffect(() => {
@@ -97,12 +72,26 @@ const Tickets = ({ user }) => {
       const endpoint = (user.role === 'Admin' || user.role === 'Engineer') 
         ? `${import.meta.env.VITE_API_URL}/tickets` 
         : `${import.meta.env.VITE_API_URL}/tickets/user/${user.id}`;
+      
+      const queryParams = new URLSearchParams({
+        page: currentPage,
+        limit: itemsPerPage,
+        status: statusFilter,
+        priority: priorityFilter,
+        category: categoryFilter,
+        sortBy: sortBy,
+        search: searchQuery
+      });
+
       const token = localStorage.getItem('token');
-      const res = await fetch(endpoint, {
+      const res = await fetch(`${endpoint}?${queryParams.toString()}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
-      if (Array.isArray(data)) setTickets(data);
+      if (data && data.data) {
+        setTickets(data.data);
+        setTotalPages(Math.ceil(data.totalCount / itemsPerPage) || 1);
+      }
     } catch (err) {
       console.error(err);
     }
@@ -125,17 +114,30 @@ const Tickets = ({ user }) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
+      const formData = new FormData();
+      formData.append('title', newTicket.title);
+      formData.append('description', newTicket.description);
+      formData.append('priority', newTicket.priority);
+      formData.append('category', newTicket.category);
+      if (newTicket.assetId) formData.append('assetId', newTicket.assetId);
+      
+      if (attachments) {
+        for (let i = 0; i < attachments.length; i++) {
+          formData.append('attachments', attachments[i]);
+        }
+      }
+
       const res = await fetch(`${import.meta.env.VITE_API_URL}/tickets`, {
         method: 'POST',
         headers: { 
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}` 
         },
-        body: JSON.stringify({ ...newTicket, requestedBy: user.id })
+        body: formData
       });
       if (res.ok) {
         setShowAddModal(false);
-        setNewTicket({ title: '', description: '', priority: 'Medium', category: 'Other' });
+        setNewTicket({ title: '', description: '', priority: 'Medium', category: 'Other', assetId: '' });
+        setAttachments(null);
         fetchTickets();
       }
     } catch (err) {
@@ -185,10 +187,10 @@ const Tickets = ({ user }) => {
   };
 
   const toggleSelectAll = () => {
-    if (selectedTicketIds.length === currentTickets.length && currentTickets.length > 0) {
+    if (selectedTicketIds.length === tickets.length && tickets.length > 0) {
       setSelectedTicketIds([]);
     } else {
-      setSelectedTicketIds(currentTickets.map(t => t.id));
+      setSelectedTicketIds(tickets.map(t => t.id));
     }
   };
 
@@ -234,11 +236,87 @@ const Tickets = ({ user }) => {
     critical: tickets.filter(t => t.priority === 'High').length
   };
 
-  // Pagination logic
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentTickets = filteredTickets.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredTickets.length / itemsPerPage);
+  // Pagination logic (now handled by backend)
+  const currentTickets = tickets;
+
+  const exportCSV = async () => {
+    try {
+      const endpoint = (user.role === 'Admin' || user.role === 'Engineer') 
+        ? `${import.meta.env.VITE_API_URL}/tickets` 
+        : `${import.meta.env.VITE_API_URL}/tickets/user/${user.id}`;
+      
+      const queryParams = new URLSearchParams({
+        status: statusFilter, priority: priorityFilter, category: categoryFilter, sortBy: sortBy, search: searchQuery, export: 'true'
+      });
+
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${endpoint}?${queryParams.toString()}`, { headers: { 'Authorization': `Bearer ${token}` } });
+      const data = await res.json();
+      const exportTickets = data.data || [];
+
+      const headers = ['ID', 'Title', 'Category', 'Priority', 'Status', 'Created At'];
+      const csvContent = [
+        headers.join(','),
+        ...exportTickets.map(t => [
+          `TKT-${t.id.substring(t.id.length-6).toUpperCase()}`,
+          `"${t.title.replace(/"/g, '""')}"`,
+          t.category,
+          t.priority,
+          t.status,
+          new Date(t.createdAt).toLocaleDateString()
+        ].join(','))
+      ].join('\n');
+      
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `tickets_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+    } catch(err) {
+      console.error('Export failed', err);
+    }
+  };
+
+  const exportPDF = async () => {
+    try {
+      const endpoint = (user.role === 'Admin' || user.role === 'Engineer') 
+        ? `${import.meta.env.VITE_API_URL}/tickets` 
+        : `${import.meta.env.VITE_API_URL}/tickets/user/${user.id}`;
+      
+      const queryParams = new URLSearchParams({
+        status: statusFilter, priority: priorityFilter, category: categoryFilter, sortBy: sortBy, search: searchQuery, export: 'true'
+      });
+
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${endpoint}?${queryParams.toString()}`, { headers: { 'Authorization': `Bearer ${token}` } });
+      const data = await res.json();
+      const exportTickets = data.data || [];
+
+      const doc = new jsPDF();
+      doc.text('Support Tickets Report', 14, 15);
+      
+      const tableData = exportTickets.map(t => [
+        `TKT-${t.id.substring(t.id.length-6).toUpperCase()}`,
+        t.title,
+        t.category,
+        t.priority,
+        t.status,
+        new Date(t.createdAt).toLocaleDateString()
+      ]);
+      
+      doc.autoTable({
+        head: [['ID', 'Title', 'Category', 'Priority', 'Status', 'Created']],
+        body: tableData,
+        startY: 25,
+        styles: { fontSize: 8 }
+      });
+      
+      doc.save(`tickets_${new Date().toISOString().split('T')[0]}.pdf`);
+    } catch(err) {
+      console.error('Export failed', err);
+    }
+  };
 
   const ActionMenu = ({ t }) => (
     <div style={{ position: 'relative' }} onClick={e => e.stopPropagation()}>
@@ -312,9 +390,13 @@ const Tickets = ({ user }) => {
           <h1 style={{ marginBottom: '0.25rem' }}>Support Tickets</h1>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>Manage and track all IT requests and incidents.</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
-          <Plus size={18} /> Raise Ticket
-        </button>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <button className="btn btn-outline" onClick={exportCSV}><Download size={14} style={{marginRight: '4px'}}/> CSV</button>
+          <button className="btn btn-outline" onClick={exportPDF}><Download size={14} style={{marginRight: '4px'}}/> PDF</button>
+          <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+            <Plus size={18} /> Raise Ticket
+          </button>
+        </div>
       </div>
 
       {/* KPI Cards */}
@@ -361,10 +443,11 @@ const Tickets = ({ user }) => {
           <Search size={16} color="var(--color-text-muted)" />
           <input 
             type="text" 
-            placeholder="Search tickets, IDs, employee names..." 
+            placeholder="Search tickets..." 
             className="search-input"
             value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
+            onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+            onKeyDown={e => { if (e.key === 'Enter') fetchTickets(); }}
           />
         </div>
         
@@ -384,11 +467,10 @@ const Tickets = ({ user }) => {
           <option value="High">High (Critical)</option>
         </select>
         
-        <select className="form-select" style={{ width: 'auto', flexShrink: 0 }} value={sortBy} onChange={e => setSortBy(e.target.value)}>
+        <select className="form-select" style={{ width: 'auto', flexShrink: 0 }} value={sortBy} onChange={e => { setSortBy(e.target.value); setCurrentPage(1); }}>
           <option value="Newest">Sort: Newest First</option>
-          <option value="Oldest">Sort: Oldest First</option>
-          <option value="Name (A-Z)">Title (A-Z)</option>
-          <option value="Name (Z-A)">Title (Z-A)</option>
+          <option value="Oldest First">Sort: Oldest First</option>
+          <option value="Priority (High to Low)">Priority (High to Low)</option>
         </select>
       </div>
 
@@ -440,7 +522,12 @@ const Tickets = ({ user }) => {
                     />
                   </td>
                 )}
-                <td style={{ fontFamily: 'monospace', fontWeight: 600, color: 'var(--color-text-muted)' }}>{formatId(t.id)}</td>
+                <td style={{ fontFamily: 'monospace', fontWeight: 600, color: 'var(--color-text-muted)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    {formatId(t.id)}
+                    {t.slaBreached && <AlertTriangle size={14} color="#dc2626" title="SLA Breached" />}
+                  </div>
+                </td>
                 <td style={{ fontWeight: 600, color: 'var(--color-navy)' }}>{t.title}</td>
                 <td><span className="badge badge-neutral">{t.category || 'Other'}</span></td>
                 <td>
@@ -469,12 +556,12 @@ const Tickets = ({ user }) => {
             ))}
           </tbody>
         </table>
-        {filteredTickets.length === 0 && (
+        {currentTickets.length === 0 && (
            <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--color-text-muted)' }}>
              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎫</div>
              <h3 style={{ color: 'var(--color-navy)', marginBottom: '0.5rem' }}>No Tickets Found</h3>
              <p>Try changing your filters or search query.</p>
-             <button className="btn btn-outline" style={{ marginTop: '1rem' }} onClick={() => { setSearchQuery(''); setStatusFilter('All'); setPriorityFilter('All'); setCategoryFilter('All'); }}>Reset Filters</button>
+             <button className="btn btn-outline" style={{ marginTop: '1rem' }} onClick={() => { setSearchQuery(''); setStatusFilter('All'); setPriorityFilter('All'); setCategoryFilter('All'); setCurrentPage(1); }}>Reset Filters</button>
            </div>
         )}
       </div>
@@ -584,6 +671,17 @@ const Tickets = ({ user }) => {
                   <option value="Medium">Medium</option>
                   <option value="High">High (Critical)</option>
                 </select>
+              </div>
+              <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                <label className="form-label">Linked Asset (Optional)</label>
+                <select className="form-select" value={newTicket.assetId} onChange={e => setNewTicket({...newTicket, assetId: e.target.value})}>
+                  <option value="">None</option>
+                  {userAssets.map(a => <option key={a._id || a.id} value={a._id || a.id}>{a.name} ({a.serialNumber})</option>)}
+                </select>
+              </div>
+              <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                <label className="form-label">Attachments</label>
+                <input type="file" multiple className="form-input" onChange={e => setAttachments(e.target.files)} />
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', borderTop: '1px solid var(--color-gray-border)', paddingTop: '1.5rem' }}>
                 <button type="button" className="btn" onClick={() => setShowAddModal(false)} style={{ backgroundColor: 'var(--color-light-gray)' }}>Cancel</button>

@@ -14,4 +14,9 @@ const assetSchema = new mongoose.Schema({
   }]
 }, { timestamps: true });
 
+assetSchema.index({ assignedTo: 1 });
+assetSchema.index({ status: 1 });
+assetSchema.index({ type: 1 });
+assetSchema.index({ name: 'text', serialNumber: 'text' });
+
 module.exports = mongoose.model('Asset', assetSchema);

@@ -1,7 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const Ticket = require('../models/Ticket');
+const User = require('../models/User');
 const authMiddleware = require('../middleware/authMiddleware');
+const requireRole = require('../middleware/roleMiddleware');
+const upload = require('../middleware/uploadMiddleware');
+const { sendEmail } = require('../utils/email');
 
 router.use(authMiddleware);
 
@@ -14,42 +18,168 @@ const mapTicket = (t) => ({
   status: t.status,
   requestedBy: t.requestedBy,
   assignedTo: t.assignedTo,
+  assetId: t.assetId,
+  dueDate: t.dueDate,
+  slaBreached: t.slaBreached,
+  attachments: t.attachments,
   comments: t.comments,
   createdAt: t.createdAt
 });
 
-// Get all tickets (Admin/Engineer)
-router.get('/', async (req, res) => {
+const calculateDueDate = (priority) => {
+  const now = new Date();
+  if (priority === 'High') return new Date(now.getTime() + 4 * 60 * 60 * 1000);
+  if (priority === 'Medium') return new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  return new Date(now.getTime() + 72 * 60 * 60 * 1000);
+};
+
+const checkSLA = (ticket) => {
+  if (ticket.status !== 'Resolved' && ticket.dueDate && new Date() > ticket.dueDate && !ticket.slaBreached) {
+    ticket.slaBreached = true;
+    return true;
+  }
+  return false;
+};
+
+// Dashboard Stats (Admin/Engineer)
+router.get('/stats', requireRole('Admin', 'Engineer'), async (req, res) => {
   try {
-    const tickets = await Ticket.find({}).sort({ createdAt: -1 });
-    res.json(tickets.map(mapTicket));
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const dailyVolume = await Ticket.aggregate([
+      { $match: { createdAt: { $gte: sevenDaysAgo } } },
+      { $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          tickets: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    const chartData = dailyVolume.map(d => ({
+      name: new Date(d._id).toLocaleDateString('en-US', { weekday: 'short' }),
+      tickets: d.tickets
+    }));
+
+    res.json({ chartData });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error fetching stats' });
   }
 });
 
-// Get tickets for specific user
+// Get all tickets
+router.get('/', requireRole('Admin', 'Engineer'), async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+    const skip = (page - 1) * limit;
+
+    const query = {};
+    if (req.query.status && req.query.status !== 'All') query.status = req.query.status;
+    if (req.query.priority && req.query.priority !== 'All') query.priority = req.query.priority;
+    if (req.query.search) {
+      query.$or = [
+        { title: { $regex: req.query.search, $options: 'i' } },
+        { description: { $regex: req.query.search, $options: 'i' } }
+      ];
+    }
+
+    let sortOption = { createdAt: -1 };
+    if (req.query.sortBy === 'Oldest First') sortOption = { createdAt: 1 };
+    if (req.query.sortBy === 'Priority (High to Low)') sortOption = { priority: -1 }; // Note: text sort may not be perfect for enum but works if standard
+
+    const totalCount = await Ticket.countDocuments(query);
+    
+    let ticketsQuery = Ticket.find(query).populate('assetId').sort(sortOption);
+    if (!req.query.export) {
+      ticketsQuery = ticketsQuery.skip(skip).limit(limit);
+    }
+    
+    const tickets = await ticketsQuery.exec();
+    
+    for (let t of tickets) {
+      if (checkSLA(t)) await t.save();
+    }
+
+    res.json({ data: tickets.map(mapTicket), totalCount });
+  } catch (error) {
+    console.error('Fetch Tickets Error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Get user tickets
 router.get('/user/:userId', async (req, res) => {
   try {
-    const tickets = await Ticket.find({ requestedBy: req.params.userId }).sort({ createdAt: -1 });
-    res.json(tickets.map(mapTicket));
+    if (req.user.id !== req.params.userId && !['Admin', 'Engineer'].includes(req.user.role)) {
+      return res.status(403).json({ message: 'Access Denied' });
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+    const skip = (page - 1) * limit;
+
+    const query = { requestedBy: req.params.userId };
+    if (req.query.status && req.query.status !== 'All') query.status = req.query.status;
+    if (req.query.priority && req.query.priority !== 'All') query.priority = req.query.priority;
+    if (req.query.search) {
+      query.$or = [
+        { title: { $regex: req.query.search, $options: 'i' } },
+        { description: { $regex: req.query.search, $options: 'i' } }
+      ];
+    }
+
+    let sortOption = { createdAt: -1 };
+    if (req.query.sortBy === 'Oldest First') sortOption = { createdAt: 1 };
+    if (req.query.sortBy === 'Priority (High to Low)') sortOption = { priority: -1 };
+
+    const totalCount = await Ticket.countDocuments(query);
+
+    let ticketsQuery = Ticket.find(query).populate('assetId').sort(sortOption);
+    if (!req.query.export) {
+      ticketsQuery = ticketsQuery.skip(skip).limit(limit);
+    }
+    const tickets = await ticketsQuery.exec();
+    
+    for (let t of tickets) {
+      if (checkSLA(t)) await t.save();
+    }
+
+    res.json({ data: tickets.map(mapTicket), totalCount });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// Create new ticket
-router.post('/', async (req, res) => {
+// Create ticket
+router.post('/', upload.array('attachments', 3), async (req, res) => {
   try {
+    const attachments = req.files ? req.files.map(f => ({ url: `/uploads/${f.filename}`, filename: f.originalname })) : [];
+    
     const ticket = new Ticket({
       title: req.body.title,
       description: req.body.description,
       category: req.body.category || 'Other',
-      priority: req.body.priority,
+      priority: req.body.priority || 'Medium',
       status: 'Open',
-      requestedBy: req.body.requestedBy
+      requestedBy: req.user.id,
+      assetId: req.body.assetId || null,
+      dueDate: calculateDueDate(req.body.priority || 'Medium'),
+      attachments
     });
+    
     const savedTicket = await ticket.save();
+
+    const adminUser = await User.findOne({ role: 'Admin' });
+    if (adminUser) {
+      sendEmail(
+        adminUser.email, 
+        `New Ticket Raised: ${savedTicket.title}`, 
+        `<p>A new ticket was raised.</p><p><strong>Title:</strong> ${savedTicket.title}</p><p><strong>Priority:</strong> ${savedTicket.priority}</p>`
+      );
+    }
+
     res.status(201).json(mapTicket(savedTicket));
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
@@ -57,14 +187,13 @@ router.post('/', async (req, res) => {
 });
 
 // Bulk update tickets
-router.post('/bulk/update', async (req, res) => {
+router.post('/bulk/update', requireRole('Admin', 'Engineer'), async (req, res) => {
   try {
     const { ticketIds, updateData } = req.body;
     if (!ticketIds || !Array.isArray(ticketIds) || ticketIds.length === 0) {
       return res.status(400).json({ message: 'No ticket IDs provided' });
     }
     
-    // Only allow updating status, assignedTo, category, priority in bulk
     const allowedUpdates = {};
     if (updateData.status) allowedUpdates.status = updateData.status;
     if (updateData.assignedTo !== undefined) allowedUpdates.assignedTo = updateData.assignedTo;
@@ -83,7 +212,7 @@ router.post('/bulk/update', async (req, res) => {
 });
 
 // Bulk delete tickets
-router.post('/bulk/delete', async (req, res) => {
+router.post('/bulk/delete', requireRole('Admin'), async (req, res) => {
   try {
     const { ticketIds } = req.body;
     if (!ticketIds || !Array.isArray(ticketIds) || ticketIds.length === 0) {
@@ -97,26 +226,55 @@ router.post('/bulk/delete', async (req, res) => {
   }
 });
 
-// Update single ticket (status/assignee)
+// Update single ticket
 router.put('/:id', async (req, res) => {
   try {
-    const updateData = {};
-    if (req.body.status) updateData.status = req.body.status;
-    if (req.body.assignedTo) updateData.assignedTo = req.body.assignedTo;
+    const ticket = await Ticket.findById(req.params.id);
+    if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
 
-    const updated = await Ticket.findByIdAndUpdate(req.params.id, updateData, { new: true });
-    if (updated) {
-      res.json(mapTicket(updated));
-    } else {
-      res.status(404).json({ message: 'Ticket not found' });
+    const updateData = {};
+    const isRequester = String(ticket.requestedBy) === req.user.id;
+    const isPrivileged = ['Admin', 'Engineer'].includes(req.user.role);
+
+    if (req.body.status) {
+      if (isRequester || isPrivileged) {
+        updateData.status = req.body.status;
+        
+        if (req.body.status === 'Resolved' && ticket.status !== 'Resolved') {
+           const requester = await User.findById(ticket.requestedBy);
+           if (requester) {
+             sendEmail(requester.email, `Ticket Resolved: ${ticket.title}`, `<p>Your ticket has been resolved.</p>`);
+           }
+        }
+      } else {
+        return res.status(403).json({ message: 'Not authorized to change status' });
+      }
     }
+
+    if (req.body.assignedTo !== undefined) {
+      if (isPrivileged) {
+        updateData.assignedTo = req.body.assignedTo;
+        
+        if (req.body.assignedTo && String(req.body.assignedTo) !== String(ticket.assignedTo)) {
+           const assignee = await User.findById(req.body.assignedTo);
+           if (assignee) {
+             sendEmail(assignee.email, `Ticket Assigned: ${ticket.title}`, `<p>You have been assigned to a new ticket.</p>`);
+           }
+        }
+      } else {
+        return res.status(403).json({ message: 'Not authorized to change assignment' });
+      }
+    }
+
+    const updated = await Ticket.findByIdAndUpdate(req.params.id, updateData, { new: true }).populate('assetId');
+    res.json(mapTicket(updated));
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// Add comment to ticket
-router.post('/:id/comments', async (req, res) => {
+// Add comment
+router.post('/:id/comments', upload.array('attachments', 3), async (req, res) => {
   try {
     const { text } = req.body;
     if (!text) return res.status(400).json({ message: 'Comment text is required' });
@@ -124,11 +282,30 @@ router.post('/:id/comments', async (req, res) => {
     const ticket = await Ticket.findById(req.params.id);
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
 
-    ticket.comments.push({ text, authorId: req.user.id });
+    const isRequester = String(ticket.requestedBy) === req.user.id;
+    const isAssignee = String(ticket.assignedTo) === req.user.id;
+    const isPrivileged = ['Admin', 'Engineer'].includes(req.user.role);
+
+    if (!isRequester && !isAssignee && !isPrivileged) {
+      return res.status(403).json({ message: 'Not authorized to comment' });
+    }
+
+    const attachments = req.files ? req.files.map(f => ({ url: `/uploads/${f.filename}`, filename: f.originalname })) : [];
+
+    ticket.comments.push({ text, authorId: req.user.id, attachments });
     await ticket.save();
     
+    if (isRequester && ticket.assignedTo) {
+      const assignee = await User.findById(ticket.assignedTo);
+      if (assignee) sendEmail(assignee.email, `New Comment on Ticket: ${ticket.title}`, `<p>The requester added a comment.</p>`);
+    } else if (isAssignee) {
+      const requester = await User.findById(ticket.requestedBy);
+      if (requester) sendEmail(requester.email, `New Comment on Ticket: ${ticket.title}`, `<p>The engineer added a comment.</p>`);
+    }
+
     res.json(mapTicket(ticket));
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Server error' });
   }
 });

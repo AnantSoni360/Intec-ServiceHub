@@ -32,7 +32,8 @@ const Login = ({ onLogin }) => {
           setIsLoading(false);
         }
       } catch (err) {
-        setError('Failed to connect to server.');
+        console.error('Fetch error:', err);
+        setError('Failed to connect to server: ' + err.message);
         setIsLoading(false);
       }
     }, 800);

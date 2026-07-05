@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Plus, Laptop, Server, Printer, Settings, CheckCircle2, AlertTriangle, MonitorSmartphone, Search, Filter, LayoutGrid, List as ListIcon, MoreVertical, Edit, UserPlus, Trash, Monitor, Smartphone, Tablet, Cpu } from 'lucide-react';
+import { Plus, Laptop, Server, Printer, Settings, CheckCircle2, AlertTriangle, MonitorSmartphone, Search, Filter, LayoutGrid, List as ListIcon, MoreVertical, Edit, UserPlus, Trash, Monitor, Smartphone, Tablet, Cpu, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import AssetSidePanel from '../components/AssetSidePanel';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const Assets = ({ user }) => {
   const [assets, setAssets] = useState([]);
@@ -29,57 +31,18 @@ const Assets = ({ user }) => {
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 50;
 
   useEffect(() => {
     fetchAssets();
+  }, [user, searchQuery, statusFilter, typeFilter, sortBy, currentPage]);
+
+  useEffect(() => {
     if (user.role === 'Admin' || user.role === 'Engineer') {
       fetchUsers();
     }
   }, [user]);
-
-  useEffect(() => {
-    let result = Array.isArray(assets) ? [...assets] : [];
-
-    if (statusFilter !== 'All') {
-      result = result.filter(a => a.status === statusFilter);
-    }
-
-    if (typeFilter !== 'All') {
-      result = result.filter(a => a.type === typeFilter);
-    }
-
-    if (searchQuery.trim() !== '') {
-      const lowerQ = searchQuery.toLowerCase();
-      result = result.filter(a => {
-        const nameMatch = a.name ? String(a.name).toLowerCase().includes(lowerQ) : false;
-        const serialMatch = a.serialNumber ? String(a.serialNumber).toLowerCase().includes(lowerQ) : false;
-        const typeMatch = a.type ? String(a.type).toLowerCase().includes(lowerQ) : false;
-        
-        let userMatch = false;
-        if (users.length > 0 && a.assignedTo) {
-          const assignee = users.find(u => u.id === a.assignedTo);
-          if (assignee && String(assignee.name).toLowerCase().includes(lowerQ)) userMatch = true;
-        }
-
-        return nameMatch || serialMatch || typeMatch || userMatch;
-      });
-    }
-
-    result.sort((a, b) => {
-      if (sortBy === 'Name (A-Z)') return (a.name || '').localeCompare(b.name || '');
-      if (sortBy === 'Name (Z-A)') return (b.name || '').localeCompare(a.name || '');
-      return 0; // Default Newest
-    });
-
-    if (sortBy === 'Oldest') {
-      result.reverse();
-    }
-
-    setFilteredAssets(result);
-    setCurrentPage(1);
-    setSelectedAssetIds([]); // Reset selection on filter change
-  }, [searchQuery, statusFilter, typeFilter, sortBy, assets, users]);
 
   // Click outside to close menus
   useEffect(() => {
@@ -93,12 +56,25 @@ const Assets = ({ user }) => {
       const endpoint = (user.role === 'Admin' || user.role === 'Engineer') 
         ? `${import.meta.env.VITE_API_URL}/assets` 
         : `${import.meta.env.VITE_API_URL}/assets/user/${user.id}`;
+      
+      const queryParams = new URLSearchParams({
+        page: currentPage,
+        limit: itemsPerPage,
+        status: statusFilter,
+        type: typeFilter,
+        sortBy: sortBy,
+        search: searchQuery
+      });
+
       const token = localStorage.getItem('token');
-      const res = await fetch(endpoint, {
+      const res = await fetch(`${endpoint}?${queryParams.toString()}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
-      if (Array.isArray(data)) setAssets(data);
+      if (data && data.data) {
+        setAssets(data.data);
+        setTotalPages(Math.ceil(data.totalCount / itemsPerPage) || 1);
+      }
     } catch (err) {
       console.error(err);
     }
@@ -201,10 +177,10 @@ const Assets = ({ user }) => {
   };
 
   const toggleSelectAll = () => {
-    if (selectedAssetIds.length === currentAssets.length && currentAssets.length > 0) {
+    if (selectedAssetIds.length === assets.length && assets.length > 0) {
       setSelectedAssetIds([]);
     } else {
-      setSelectedAssetIds(currentAssets.map(a => a.id));
+      setSelectedAssetIds(assets.map(a => a.id));
     }
   };
 
@@ -251,11 +227,85 @@ const Assets = ({ user }) => {
     maintenance: assets.filter(a => a.status === 'Maintenance').length
   };
 
-  // Pagination logic
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentAssets = filteredAssets.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredAssets.length / itemsPerPage);
+  // Pagination logic (now handled by backend)
+  const currentAssets = assets;
+
+  const exportCSV = async () => {
+    try {
+      const endpoint = (user.role === 'Admin' || user.role === 'Engineer') 
+        ? `${import.meta.env.VITE_API_URL}/assets` 
+        : `${import.meta.env.VITE_API_URL}/assets/user/${user.id}`;
+      
+      const queryParams = new URLSearchParams({
+        status: statusFilter, type: typeFilter, sortBy: sortBy, search: searchQuery, export: 'true'
+      });
+
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${endpoint}?${queryParams.toString()}`, { headers: { 'Authorization': `Bearer ${token}` } });
+      const data = await res.json();
+      const exportAssets = data.data || [];
+
+      const headers = ['Name', 'Type', 'Serial Number', 'Status', 'Created At'];
+      const csvContent = [
+        headers.join(','),
+        ...exportAssets.map(a => [
+          `"${(a.name || '').replace(/"/g, '""')}"`,
+          a.type,
+          a.serialNumber,
+          a.status,
+          new Date(a.createdAt).toLocaleDateString()
+        ].join(','))
+      ].join('\n');
+      
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `assets_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+    } catch(err) {
+      console.error('Export failed', err);
+    }
+  };
+
+  const exportPDF = async () => {
+    try {
+      const endpoint = (user.role === 'Admin' || user.role === 'Engineer') 
+        ? `${import.meta.env.VITE_API_URL}/assets` 
+        : `${import.meta.env.VITE_API_URL}/assets/user/${user.id}`;
+      
+      const queryParams = new URLSearchParams({
+        status: statusFilter, type: typeFilter, sortBy: sortBy, search: searchQuery, export: 'true'
+      });
+
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${endpoint}?${queryParams.toString()}`, { headers: { 'Authorization': `Bearer ${token}` } });
+      const data = await res.json();
+      const exportAssets = data.data || [];
+
+      const doc = new jsPDF();
+      doc.text('IT Assets Report', 14, 15);
+      
+      const tableData = exportAssets.map(a => [
+        a.name,
+        a.type,
+        a.serialNumber,
+        a.status,
+        new Date(a.createdAt).toLocaleDateString()
+      ]);
+      
+      doc.autoTable({
+        head: [['Name', 'Type', 'Serial Number', 'Status', 'Created At']],
+        body: tableData,
+        startY: 25,
+        styles: { fontSize: 8 }
+      });
+      
+      doc.save(`assets_${new Date().toISOString().split('T')[0]}.pdf`);
+    } catch(err) {
+      console.error('Export failed', err);
+    }
+  };
 
   const ActionMenu = ({ a }) => (
     <div style={{ position: 'relative' }} onClick={e => e.stopPropagation()}>
@@ -347,9 +397,13 @@ const Assets = ({ user }) => {
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>Track hardware inventory and assignments.</p>
         </div>
         {user.role === 'Admin' && (
-          <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
-            <Plus size={18} /> Add Asset
-          </button>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <button className="btn btn-outline" onClick={exportCSV}><Download size={14} style={{marginRight: '4px'}}/> CSV</button>
+            <button className="btn btn-outline" onClick={exportPDF}><Download size={14} style={{marginRight: '4px'}}/> PDF</button>
+            <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+              <Plus size={18} /> Add Asset
+            </button>
+          </div>
         )}
       </div>
 
@@ -374,10 +428,11 @@ const Assets = ({ user }) => {
           <Search size={16} color="var(--color-text-muted)" />
           <input 
             type="text" 
-            placeholder="Search assets, serial numbers, assignees..." 
+            placeholder="Search assets..." 
             className="search-input"
             value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
+            onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+            onKeyDown={e => { if (e.key === 'Enter') fetchAssets(); }}
           />
         </div>
         
@@ -399,11 +454,9 @@ const Assets = ({ user }) => {
           <option value="Other">Other</option>
         </select>
         
-        <select className="form-select" style={{ width: 'auto', flexShrink: 0 }} value={sortBy} onChange={e => setSortBy(e.target.value)}>
+        <select className="form-select" style={{ width: 'auto', flexShrink: 0 }} value={sortBy} onChange={e => { setSortBy(e.target.value); setCurrentPage(1); }}>
           <option value="Newest">Sort: Newest</option>
-          <option value="Oldest">Sort: Oldest</option>
-          <option value="Name (A-Z)">Name (A-Z)</option>
-          <option value="Name (Z-A)">Name (Z-A)</option>
+          <option value="Oldest First">Sort: Oldest</option>
         </select>
 
         <div style={{ display: 'flex', border: '1px solid var(--color-gray-border)', borderRadius: '8px', overflow: 'hidden', marginLeft: 'auto' }}>
@@ -467,7 +520,7 @@ const Assets = ({ user }) => {
               ))}
             </tbody>
           </table>
-          {filteredAssets.length === 0 && (
+          {currentAssets.length === 0 && (
              <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--color-text-muted)' }}>
                <Search size={48} style={{ opacity: 0.2, margin: '0 auto 1rem' }} />
                <p>No assets match your filters.</p>
@@ -520,7 +573,7 @@ const Assets = ({ user }) => {
               </div>
             </motion.div>
           ))}
-          {filteredAssets.length === 0 && (
+          {currentAssets.length === 0 && (
              <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '4rem', color: 'var(--color-text-muted)' }}>
                <Search size={48} style={{ opacity: 0.2, margin: '0 auto 1rem' }} />
                <p>No assets match your filters.</p>

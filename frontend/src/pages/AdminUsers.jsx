@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, Edit2, Trash2, Key } from 'lucide-react';
 
 const AdminUsers = ({ user }) => {
   const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editUserId, setEditUserId] = useState(null);
   const [newUser, setNewUser] = useState({ name: '', email: '', role: 'Employee', department: '' });
 
   useEffect(() => {
@@ -23,16 +25,91 @@ const AdminUsers = ({ user }) => {
     }
   };
 
-  const handleCreateUser = async (e) => {
+  const handleSaveUser = async (e) => {
     e.preventDefault();
-    // For static data, we just update local state since there is no POST /users endpoint yet.
-    // In a real app, this would be an API call.
-    const createdUser = {
-      id: (users.length + 1).toString(),
-      ...newUser
-    };
-    setUsers([...users, createdUser]);
+    try {
+      const token = localStorage.getItem('token');
+      const url = isEditing 
+        ? `${import.meta.env.VITE_API_URL}/auth/users/${editUserId}`
+        : `${import.meta.env.VITE_API_URL}/auth/users`;
+      
+      const res = await fetch(url, {
+        method: isEditing ? 'PUT' : 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify(newUser)
+      });
+      
+      if (res.ok) {
+        await fetchUsers();
+        handleCloseModal();
+      } else {
+        const errorData = await res.json();
+        alert(`Error: ${errorData.message}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to save user');
+    }
+  };
+
+  const handleEditClick = (u) => {
+    setNewUser({ name: u.name, email: u.email, role: u.role, department: u.department });
+    setEditUserId(u.id);
+    setIsEditing(true);
+    setShowModal(true);
+  };
+
+  const handleDeleteClick = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/users/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (res.ok) {
+        await fetchUsers();
+      } else {
+        const errorData = await res.json();
+        alert(`Error: ${errorData.message}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to delete user');
+    }
+  };
+
+  const handleResetPassword = async (id) => {
+    if (!window.confirm("Are you sure you want to reset this user's password to the default?")) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/users/${id}/reset-password`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (res.ok) {
+        alert("Password reset successfully.");
+      } else {
+        const errorData = await res.json();
+        alert(`Error: ${errorData.message}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to reset password');
+    }
+  };
+
+  const handleCloseModal = () => {
     setShowModal(false);
+    setIsEditing(false);
+    setEditUserId(null);
     setNewUser({ name: '', email: '', role: 'Employee', department: '' });
   };
 
@@ -73,13 +150,15 @@ const AdminUsers = ({ user }) => {
           <tbody>
             {users.map(u => (
               <tr key={u.id}>
-                <td>#{u.id}</td>
+                <td>#{u.id.substring(0, 8)}...</td>
                 <td style={{ fontWeight: '500' }}>{u.name}</td>
                 <td style={{ color: 'var(--color-text-muted)' }}>{u.email}</td>
                 <td>{getRoleBadge(u.role)}</td>
                 <td>{u.department}</td>
-                <td>
-                  <button className="btn" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', backgroundColor: 'var(--color-light-gray)' }}>Edit</button>
+                <td style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button className="btn" onClick={() => handleEditClick(u)} title="Edit User" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', backgroundColor: 'var(--color-light-gray)' }}><Edit2 size={14} /></button>
+                  <button className="btn" onClick={() => handleResetPassword(u.id)} title="Reset Password" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', backgroundColor: 'var(--color-light-gray)' }}><Key size={14} /></button>
+                  <button className="btn" onClick={() => handleDeleteClick(u.id)} title="Delete User" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', backgroundColor: '#fee2e2', color: '#dc2626', border: 'none' }}><Trash2 size={14} /></button>
                 </td>
               </tr>
             ))}
@@ -97,8 +176,8 @@ const AdminUsers = ({ user }) => {
       {showModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
           <div className="card" style={{ width: '100%', maxWidth: '500px' }}>
-            <h2 className="card-title">Add New User</h2>
-            <form onSubmit={handleCreateUser}>
+            <h2 className="card-title">{isEditing ? 'Edit User' : 'Add New User'}</h2>
+            <form onSubmit={handleSaveUser}>
               <div className="form-group">
                 <label className="form-label">Full Name</label>
                 <input className="form-input" required value={newUser.name} onChange={e => setNewUser({...newUser, name: e.target.value})} placeholder="e.g. Alice Johnson" />
@@ -120,8 +199,8 @@ const AdminUsers = ({ user }) => {
                 <input className="form-input" required value={newUser.department} onChange={e => setNewUser({...newUser, department: e.target.value})} placeholder="e.g. Human Resources" />
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1.5rem' }}>
-                <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ backgroundColor: 'var(--color-light-gray)' }}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Add User</button>
+                <button type="button" className="btn" onClick={handleCloseModal} style={{ backgroundColor: 'var(--color-light-gray)' }}>Cancel</button>
+                <button type="submit" className="btn btn-primary">{isEditing ? 'Save Changes' : 'Add User'}</button>
               </div>
             </form>
           </div>

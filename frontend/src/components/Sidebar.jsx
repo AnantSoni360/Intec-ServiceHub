@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Ticket, Laptop, Users, ChevronsRight, Settings } from 'lucide-react';
+import { LayoutDashboard, Ticket, Laptop, Users, ChevronsRight, Settings, BookOpen } from 'lucide-react';
 
 const Sidebar = ({ role }) => {
   const location = useLocation();
@@ -7,6 +7,7 @@ const Sidebar = ({ role }) => {
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={22} /> },
     { name: 'Tickets', path: '/tickets', icon: <Ticket size={22} /> },
+    { name: 'Knowledge Base', path: '/knowledge', icon: <BookOpen size={22} /> },
   ];
 
   if (role === 'Admin' || role === 'Engineer') {

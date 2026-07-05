@@ -40,6 +40,7 @@ const Dashboard = ({ user }) => {
   const [stats, setStats] = useState({ tickets: 0, openTickets: 0, assets: 0, resolved: 0 });
   const [recentTickets, setRecentTickets] = useState([]);
   const [myWorkload, setMyWorkload] = useState([]);
+  const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,6 +69,14 @@ const Dashboard = ({ user }) => {
 
         if (user.role === 'Engineer') {
           setMyWorkload(tickets.filter(t => t.assignedTo === user.id && t.status !== 'Resolved'));
+        }
+
+        if (user.role === 'Admin' || user.role === 'Engineer') {
+          const statsRes = await fetch(`${import.meta.env.VITE_API_URL}/tickets/stats`, fetchOptions);
+          const statsData = await statsRes.json();
+          if (statsData.chartData) {
+            setChartData(statsData.chartData);
+          }
         }
       } catch (err) {
         console.error('Error fetching dashboard stats', err);
@@ -130,7 +139,7 @@ const Dashboard = ({ user }) => {
             <h2 className="card-title">Weekly Ticket Volume</h2>
             <div style={{ width: '100%', height: '300px', marginTop: '1rem' }}>
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={mockChartData}>
+                <AreaChart data={chartData}>
                   <defs>
                     <linearGradient id="colorTickets" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="var(--color-azure)" stopOpacity={0.3}/>
