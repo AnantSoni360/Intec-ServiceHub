@@ -338,7 +338,8 @@ router.get('/:id/attachments/:filename', async (req, res) => {
       return res.status(403).json({ message: 'Access denied to this attachment' });
     }
 
-    const filePath = path.join(__dirname, '..', 'uploads', req.params.filename);
+    const safeFilename = path.basename(req.params.filename);
+    const filePath = path.join(__dirname, '..', 'uploads', safeFilename);
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: 'File not found on disk' });
     }

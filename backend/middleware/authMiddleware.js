@@ -6,8 +6,6 @@ const authMiddleware = (req, res, next) => {
 
   if (authHeader && authHeader.startsWith('Bearer ')) {
     token = authHeader.split(' ')[1];
-  } else if (req.query.token) {
-    token = req.query.token;
   }
 
   if (!token) {
@@ -15,7 +13,10 @@ const authMiddleware = (req, res, next) => {
   }
 
   try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key');
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET is not configured on the server.');
+    }
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
     req.user = verified;
     next();
   } catch (error) {
