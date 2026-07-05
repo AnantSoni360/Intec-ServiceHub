@@ -20,13 +20,13 @@ if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
 }
 
 const corsOptions = {
-  origin: '*',
+  origin: process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : '*',
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
 app.use(express.json());
 const path = require('path');
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Removed unauthenticated static uploads route. Attachments are served securely via ticket routes.
 
 // Security: Rate Limiting
 const apiLimiter = rateLimit({

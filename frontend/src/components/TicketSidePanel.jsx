@@ -123,7 +123,7 @@ const TicketSidePanel = ({ ticket, isOpen, onClose, getStatusBadge, getPriorityB
                     <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '0.5rem' }}>Attachments</div>
                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                       {ticket.attachments.map((att, i) => (
-                        <a key={i} href={`${import.meta.env.VITE_API_URL.replace('/api', '')}${att.url}`} target="_blank" rel="noreferrer" style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem', backgroundColor: 'var(--color-light-gray)', border: '1px solid var(--color-gray-border)', borderRadius: '4px', textDecoration: 'none', color: 'var(--color-azure)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <a key={i} href={`${import.meta.env.VITE_API_URL.replace('/api', '')}${att.url}?token=${localStorage.getItem('token')}`} target="_blank" rel="noreferrer" style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem', backgroundColor: 'var(--color-light-gray)', border: '1px solid var(--color-gray-border)', borderRadius: '4px', textDecoration: 'none', color: 'var(--color-azure)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                           <Paperclip size={12} /> {att.filename}
                         </a>
                       ))}
@@ -193,7 +193,7 @@ const TicketSidePanel = ({ ticket, isOpen, onClose, getStatusBadge, getPriorityB
                           {comment.attachments && comment.attachments.length > 0 && (
                             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
                               {comment.attachments.map((att, i) => (
-                                <a key={i} href={`${import.meta.env.VITE_API_URL.replace('/api', '')}${att.url}`} target="_blank" rel="noreferrer" style={{ fontSize: '0.7rem', padding: '0.15rem 0.4rem', backgroundColor: 'var(--color-white)', border: '1px solid var(--color-gray-border)', borderRadius: '4px', textDecoration: 'none', color: 'var(--color-azure)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <a key={i} href={`${import.meta.env.VITE_API_URL.replace('/api', '')}${att.url}?token=${localStorage.getItem('token')}`} target="_blank" rel="noreferrer" style={{ fontSize: '0.7rem', padding: '0.15rem 0.4rem', backgroundColor: 'var(--color-white)', border: '1px solid var(--color-gray-border)', borderRadius: '4px', textDecoration: 'none', color: 'var(--color-azure)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                                   <Paperclip size={10} /> {att.filename}
                                 </a>
                               ))}

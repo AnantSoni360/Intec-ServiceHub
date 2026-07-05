@@ -113,11 +113,14 @@ router.post('/users', authMiddleware, requireRole('Admin'), async (req, res) => 
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ message: 'User already exists' });
 
-    const password = await bcrypt.hash('Changeme123!', 10);
+    const crypto = require('crypto');
+    const tempPassword = crypto.randomBytes(6).toString('hex'); // 12 characters
+
+    const password = await bcrypt.hash(tempPassword, 10);
     const user = new User({ name, email, password, role, department });
     await user.save();
 
-    res.status(201).json({ id: user._id, name: user.name, email: user.email, role: user.role, department: user.department });
+    res.status(201).json({ id: user._id, name: user.name, email: user.email, role: user.role, department: user.department, tempPassword });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -153,9 +156,11 @@ router.post('/users/:id/reset-password', authMiddleware, requireRole('Admin'), a
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    user.password = await bcrypt.hash('Changeme123!', 10);
+    const crypto = require('crypto');
+    const tempPassword = crypto.randomBytes(6).toString('hex');
+    user.password = await bcrypt.hash(tempPassword, 10);
     await user.save();
-    res.json({ message: 'Password reset to default (Changeme123!) successfully' });
+    res.json({ message: 'Password reset successfully', tempPassword });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }

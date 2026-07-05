@@ -43,8 +43,12 @@ const AdminUsers = ({ user }) => {
       });
       
       if (res.ok) {
+        const data = await res.json();
         await fetchUsers();
         handleCloseModal();
+        if (data.tempPassword) {
+          alert(`User created successfully.\n\nTemporary Password: ${data.tempPassword}\n\nPlease share this securely with the user.`);
+        }
       } else {
         const errorData = await res.json();
         alert(`Error: ${errorData.message}`);
@@ -95,7 +99,8 @@ const AdminUsers = ({ user }) => {
       });
       
       if (res.ok) {
-        alert("Password reset successfully.");
+        const data = await res.json();
+        alert(`Password reset successfully.\n\nNew Temporary Password: ${data.tempPassword}\n\nPlease share this securely with the user.`);
       } else {
         const errorData = await res.json();
         alert(`Error: ${errorData.message}`);

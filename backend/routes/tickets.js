@@ -21,8 +21,19 @@ const mapTicket = (t) => ({
   assetId: t.assetId,
   dueDate: t.dueDate,
   slaBreached: t.slaBreached,
-  attachments: t.attachments,
-  comments: t.comments,
+  attachments: t.attachments ? t.attachments.map(att => ({
+    filename: att.filename,
+    url: att.url && att.url.startsWith('/uploads/') ? `/api/tickets/${t._id}/attachments/${att.url.replace('/uploads/', '')}` : att.url
+  })) : [],
+  comments: t.comments ? t.comments.map(c => ({
+    text: c.text,
+    authorId: c.authorId,
+    createdAt: c.createdAt,
+    attachments: c.attachments ? c.attachments.map(att => ({
+      filename: att.filename,
+      url: att.url && att.url.startsWith('/uploads/') ? `/api/tickets/${t._id}/attachments/${att.url.replace('/uploads/', '')}` : att.url
+    })) : []
+  })) : [],
   createdAt: t.createdAt
 });
 
@@ -306,6 +317,34 @@ router.post('/:id/comments', upload.array('attachments', 3), async (req, res) =>
     res.json(mapTicket(ticket));
   } catch (error) {
     console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+const path = require('path');
+const fs = require('fs');
+
+// Secure Attachment Download
+router.get('/:id/attachments/:filename', async (req, res) => {
+  try {
+    const ticket = await Ticket.findById(req.params.id);
+    if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
+
+    const isRequester = String(ticket.requestedBy) === req.user.id;
+    const isAssignee = String(ticket.assignedTo) === req.user.id;
+    const isPrivileged = ['Admin', 'Engineer'].includes(req.user.role);
+
+    if (!isRequester && !isAssignee && !isPrivileged) {
+      return res.status(403).json({ message: 'Access denied to this attachment' });
+    }
+
+    const filePath = path.join(__dirname, '..', 'uploads', req.params.filename);
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: 'File not found on disk' });
+    }
+
+    res.sendFile(filePath);
+  } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
 });

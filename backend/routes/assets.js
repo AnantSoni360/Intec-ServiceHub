@@ -90,7 +90,7 @@ router.get('/user/:userId', async (req, res) => {
 });
 
 // Create new asset
-router.post('/', async (req, res) => {
+router.post('/', requireRole('Admin', 'Engineer'), async (req, res) => {
   try {
     const asset = new Asset({
       name: req.body.name,
@@ -161,7 +161,7 @@ router.post('/bulk/delete', requireRole('Admin'), async (req, res) => {
 });
 
 // Update asset assignment/status
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireRole('Admin', 'Engineer'), async (req, res) => {
   try {
     const asset = await Asset.findById(req.params.id);
     if (!asset) return res.status(404).json({ message: 'Asset not found' });
