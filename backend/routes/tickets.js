@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+
+const escapeRegex = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const Ticket = require('../models/Ticket');
 const User = require('../models/User');
 const authMiddleware = require('../middleware/authMiddleware');
@@ -90,9 +92,10 @@ router.get('/', requireRole('Admin', 'Engineer'), async (req, res) => {
     if (req.query.status && req.query.status !== 'All') query.status = req.query.status;
     if (req.query.priority && req.query.priority !== 'All') query.priority = req.query.priority;
     if (req.query.search) {
+      const safeSearch = escapeRegex(req.query.search);
       query.$or = [
-        { title: { $regex: req.query.search, $options: 'i' } },
-        { description: { $regex: req.query.search, $options: 'i' } }
+        { title: { $regex: safeSearch, $options: 'i' } },
+        { description: { $regex: safeSearch, $options: 'i' } }
       ];
     }
 
@@ -135,9 +138,10 @@ router.get('/user/:userId', async (req, res) => {
     if (req.query.status && req.query.status !== 'All') query.status = req.query.status;
     if (req.query.priority && req.query.priority !== 'All') query.priority = req.query.priority;
     if (req.query.search) {
+      const safeSearch = escapeRegex(req.query.search);
       query.$or = [
-        { title: { $regex: req.query.search, $options: 'i' } },
-        { description: { $regex: req.query.search, $options: 'i' } }
+        { title: { $regex: safeSearch, $options: 'i' } },
+        { description: { $regex: safeSearch, $options: 'i' } }
       ];
     }
 
