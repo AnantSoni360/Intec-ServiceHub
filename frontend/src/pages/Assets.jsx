@@ -3,6 +3,7 @@ import { Plus, Laptop, Server, Printer, Settings, CheckCircle2, AlertTriangle, M
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import AssetSidePanel from '../components/AssetSidePanel';
+import AssignAssetModal from '../components/AssignAssetModal';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
@@ -23,6 +24,7 @@ const Assets = ({ user }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newAsset, setNewAsset] = useState({ name: '', type: 'Laptop', serialNumber: '' });
   const [users, setUsers] = useState([]);
+  const [assetToAssign, setAssetToAssign] = useState(null);
   
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [activeMenuId, setActiveMenuId] = useState(null);
@@ -353,10 +355,7 @@ const Assets = ({ user }) => {
                 onMouseEnter={e => e.target.style.backgroundColor = 'var(--color-light-gray)'}
                 onMouseLeave={e => e.target.style.backgroundColor = 'transparent'}
                 onClick={() => {
-                  const newUserId = window.prompt("Enter User ID to assign (leave blank to unassign):", a.assignedTo || "");
-                  if (newUserId !== null) {
-                    updateAssetAssignment(a.id, newUserId || null);
-                  }
+                  setAssetToAssign(a);
                   setActiveMenuId(null);
                 }}
               >
@@ -697,6 +696,18 @@ const Assets = ({ user }) => {
         getTypeIcon={getTypeIcon}
         users={users}
       />
+
+      {assetToAssign && (
+        <AssignAssetModal 
+          asset={assetToAssign}
+          users={users}
+          onClose={() => setAssetToAssign(null)}
+          onAssign={(assetId, userId) => {
+            updateAssetAssignment(assetId, userId);
+            setAssetToAssign(null);
+          }}
+        />
+      )}
     </motion.div>
   );
 };
