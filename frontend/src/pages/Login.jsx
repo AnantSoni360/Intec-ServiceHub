@@ -190,9 +190,9 @@ const Login = ({ onLogin }) => {
           <div style={{ marginTop: '2.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--color-gray-border)', fontSize: '0.75rem', color: 'var(--color-text-muted)', textAlign: 'center' }}>
             <p style={{ marginBottom: '0.5rem', fontWeight: '600' }}>Demo Accounts Available:</p>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-              <span className="badge badge-neutral">kavita.reddy@intec-demo.com (Employee)</span>
-              <span className="badge badge-neutral">marcus.chen@intec-demo.com (Engineer)</span>
-              <span className="badge badge-neutral">sarah.jenkins@intec-demo.com (Admin)</span>
+              <span className="badge badge-neutral">karan.nair8@intec-demo.com (Employee)</span>
+              <span className="badge badge-neutral">rohan.gowda1@intec-demo.com (Engineer)</span>
+              <span className="badge badge-neutral">kavita.reddy@intec-demo.com (Admin)</span>
             </div>
           </div>
         </motion.div>
