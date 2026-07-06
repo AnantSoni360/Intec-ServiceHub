@@ -6,11 +6,9 @@ const Ticket = require('../models/Ticket');
 const Asset = require('../models/Asset');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const multer = require('multer');
+const upload = require('../middleware/uploadMiddleware');
 const csv = require('csv-parser');
 const fs = require('fs');
-
-const upload = multer({ dest: 'uploads/' });
 
 // Register a new company and super admin
 router.post('/register', async (req, res) => {
@@ -173,15 +171,21 @@ router.post('/upload-data', authMiddleware, upload.fields([{ name: 'users' }, { 
       }
     }
 
-    // Cleanup uploaded files
-    Object.keys(req.files).forEach(key => {
-      req.files[key].forEach(file => fs.unlinkSync(file.path));
-    });
-
     res.json({ success: true, message: `Data uploaded successfully. Added ${usersCount} users, ${assetsCount} assets, and ${ticketsCount} tickets.` });
   } catch (error) {
     console.error('Upload Data Error:', error);
-    res.status(500).json({ success: false, message: 'Server error during data upload' });
+    res.status(500).json({ success: false, message: error.message || 'Server error during data upload' });
+  } finally {
+    // Cleanup uploaded files
+    if (req.files) {
+      Object.keys(req.files).forEach(key => {
+        req.files[key].forEach(file => {
+          if (fs.existsSync(file.path)) {
+            fs.unlinkSync(file.path);
+          }
+        });
+      });
+    }
   }
 });
 
