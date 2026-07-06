@@ -20,7 +20,7 @@ if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
 }
 
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : '*',
+  origin: process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL.replace(/\/$/, '') : '*',
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
