@@ -71,6 +71,33 @@ const TicketSidePanel = ({ ticket, isOpen, onClose, getStatusBadge, getPriorityB
     }
   };
 
+  const handleUpdate = async (field, value) => {
+    try {
+      const token = localStorage.getItem('token');
+      const payload = {};
+      if (field === 'assignedTo') payload.assignedTo = value || null;
+      if (field === 'status') payload.status = value;
+
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/tickets/${ticket.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        const updatedTicket = await res.json();
+        onUpdateTicket(updatedTicket);
+      } else {
+        alert(`Failed to update ${field}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert(`An error occurred while updating ${field}`);
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -121,7 +148,22 @@ const TicketSidePanel = ({ ticket, isOpen, onClose, getStatusBadge, getPriorityB
                 </div>
                 <div style={{ flex: '1 1 30%' }}>
                   <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>Status</div>
-                  <div>{getStatusBadge(ticket.status)}</div>
+                  {user.role === 'Admin' || user.role === 'super_admin' || user.role === 'Engineer' ? (
+                    <select 
+                      className="form-select" 
+                      style={{ padding: '0.25rem', fontSize: '0.875rem' }}
+                      value={ticket.status}
+                      onChange={(e) => handleUpdate('status', e.target.value)}
+                    >
+                      <option value="Open">Open</option>
+                      <option value="In Progress">In Progress</option>
+                      {!(user.role === 'Engineer' && !ticket.assignedTo) && (
+                        <option value="Resolved">Resolved</option>
+                      )}
+                    </select>
+                  ) : (
+                    <div>{getStatusBadge(ticket.status)}</div>
+                  )}
                 </div>
                 <div style={{ flex: '1 1 30%' }}>
                   <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>Priority</div>
@@ -164,9 +206,49 @@ const TicketSidePanel = ({ ticket, isOpen, onClose, getStatusBadge, getPriorityB
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <Briefcase size={16} color="var(--color-text-muted)" />
-                  <div>
+                  <div style={{ flex: 1 }}>
                     <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Assigned Engineer</div>
-                    <div style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--color-navy)' }}>{assignee ? assignee.name : <span style={{ fontStyle: 'italic', color: 'var(--color-text-muted)' }}>Unassigned</span>}</div>
+                    {user.role === 'Admin' || user.role === 'super_admin' ? (
+                      <select 
+                        className="form-select" 
+                        style={{ padding: '0.25rem', marginTop: '0.25rem', fontSize: '0.875rem' }}
+                        value={ticket.assignedTo || ''}
+                        onChange={(e) => handleUpdate('assignedTo', e.target.value)}
+                      >
+                        <option value="">Unassigned</option>
+                        {users.filter(u => u.role === 'Engineer').map(u => (
+                          <option key={u.id} value={u.id}>{u.name}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <div style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--color-navy)' }}>{assignee ? assignee.name : <span style={{ fontStyle: 'italic', color: 'var(--color-text-muted)' }}>Unassigned</span>}</div>
+                    )}
+                    {user.role === 'Engineer' && !ticket.assignedTo && (
+                      <button 
+                        className="btn btn-primary" 
+                        style={{ marginTop: '0.5rem', padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}
+                        onClick={async () => {
+                          try {
+                            const res = await fetch(`${import.meta.env.VITE_API_URL}/tickets/${ticket.id}/request-assignment`, {
+                              method: 'POST',
+                              headers: { 'Authorization': `Bearer ${user.token}` }
+                            });
+                            if (res.ok) {
+                              alert('Assignment requested successfully');
+                              const updatedTicket = await res.json();
+                              onUpdate(updatedTicket);
+                            } else {
+                              const err = await res.json();
+                              alert(err.message || 'Failed to request assignment');
+                            }
+                          } catch (err) {
+                            alert('An error occurred');
+                          }
+                        }}
+                      >
+                        Request Assignment
+                      </button>
+                    )}
                   </div>
                 </div>
                 {ticket.dueDate && (

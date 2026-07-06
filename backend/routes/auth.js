@@ -1,20 +1,33 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const Company = require('../models/Company');
+
+// Get all companies (public)
+router.get('/companies', async (req, res) => {
+  try {
+    const companies = await Company.find({}, '_id name').sort({ name: 1 });
+    res.json({ success: true, data: companies });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
 
 // Login
 router.post('/login', async (req, res) => {
   try {
     console.log('Login request received for:', req.body.email);
-    const { email, password } = req.body;
+    const { email, password, companyId } = req.body;
     const bcrypt = require('bcryptjs');
 
-    const user = await User.findOne({ email });
+    if (!companyId) return res.status(400).json({ success: false, message: 'Company selection is required' });
+
+    const user = await User.findOne({ email, companyId }).populate('companyId');
     
     if (user) {
       const isMatch = await bcrypt.compare(password, user.password);
       if (isMatch) {
-        const safeUser = { id: user._id, name: user.name, email: user.email, role: user.role, department: user.department };
+        const safeUser = { id: user._id, name: user.name, email: user.email, role: user.role, department: user.department, companyId: user.companyId._id, companyName: user.companyId?.name };
         const jwt = require('jsonwebtoken');
         if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is required');
         const token = jwt.sign(safeUser, process.env.JWT_SECRET, { expiresIn: '1d' });
@@ -34,7 +47,7 @@ router.post('/login', async (req, res) => {
 // Google OAuth Login
 router.post('/google', async (req, res) => {
   try {
-    const { token } = req.body;
+    const { token, companyId } = req.body;
     const { OAuth2Client } = require('google-auth-library');
     if (!process.env.GOOGLE_CLIENT_ID) throw new Error('GOOGLE_CLIENT_ID is required');
     const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -46,9 +59,10 @@ router.post('/google', async (req, res) => {
     const payload = ticket.getPayload();
     const email = payload.email;
 
-    const user = await User.findOne({ email });
+    if (!companyId) return res.status(400).json({ success: false, message: 'Company selection is required' });
+    const user = await User.findOne({ email, companyId }).populate('companyId');
     if (user) {
-      const safeUser = { id: user._id, name: user.name, email: user.email, role: user.role, department: user.department };
+      const safeUser = { id: user._id, name: user.name, email: user.email, role: user.role, department: user.department, companyId: user.companyId._id, companyName: user.companyId?.name };
       const jwt = require('jsonwebtoken');
       if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is required');
       const serverToken = jwt.sign(safeUser, process.env.JWT_SECRET, { expiresIn: '1d' });
@@ -66,7 +80,7 @@ router.post('/google', async (req, res) => {
 const authMiddleware = require('../middleware/authMiddleware');
 router.get('/users', authMiddleware, async (req, res) => {
   try {
-    const users = await User.find({});
+    const users = await User.find({ companyId: req.user.companyId });
     // Map _id to id
     res.json(users.map(u => ({ id: u._id, name: u.name, email: u.email, role: u.role, department: u.department })));
   } catch (error) {
@@ -105,19 +119,19 @@ router.post('/change-password', authMiddleware, async (req, res) => {
 const requireRole = require('../middleware/roleMiddleware');
 
 // Create user
-router.post('/users', authMiddleware, requireRole('Admin'), async (req, res) => {
+router.post('/users', authMiddleware, requireRole('Admin', 'super_admin'), async (req, res) => {
   try {
     const { name, email, role, department } = req.body;
     const bcrypt = require('bcryptjs');
     
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email, companyId: req.user.companyId });
     if (existingUser) return res.status(400).json({ message: 'User already exists' });
 
     const crypto = require('crypto');
     const tempPassword = crypto.randomBytes(6).toString('hex'); // 12 characters
 
     const password = await bcrypt.hash(tempPassword, 10);
-    const user = new User({ name, email, password, role, department });
+    const user = new User({ name, email, password, role, department, companyId: req.user.companyId });
     await user.save();
 
     res.status(201).json({ id: user._id, name: user.name, email: user.email, role: user.role, department: user.department, tempPassword });
@@ -127,10 +141,14 @@ router.post('/users', authMiddleware, requireRole('Admin'), async (req, res) => 
 });
 
 // Update user
-router.put('/users/:id', authMiddleware, requireRole('Admin'), async (req, res) => {
+router.put('/users/:id', authMiddleware, requireRole('Admin', 'super_admin'), async (req, res) => {
   try {
     const { name, email, role, department } = req.body;
-    const user = await User.findByIdAndUpdate(req.params.id, { name, email, role, department }, { new: true });
+    const user = await User.findOneAndUpdate(
+      { _id: req.params.id, companyId: req.user.companyId },
+      { name, email, role, department },
+      { new: true }
+    );
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json({ id: user._id, name: user.name, email: user.email, role: user.role, department: user.department });
   } catch (error) {
@@ -139,9 +157,9 @@ router.put('/users/:id', authMiddleware, requireRole('Admin'), async (req, res) 
 });
 
 // Delete user
-router.delete('/users/:id', authMiddleware, requireRole('Admin'), async (req, res) => {
+router.delete('/users/:id', authMiddleware, requireRole('Admin', 'super_admin'), async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
+    const user = await User.findOneAndDelete({ _id: req.params.id, companyId: req.user.companyId });
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
@@ -150,10 +168,10 @@ router.delete('/users/:id', authMiddleware, requireRole('Admin'), async (req, re
 });
 
 // Reset password (Admin only)
-router.post('/users/:id/reset-password', authMiddleware, requireRole('Admin'), async (req, res) => {
+router.post('/users/:id/reset-password', authMiddleware, requireRole('Admin', 'super_admin'), async (req, res) => {
   try {
     const bcrypt = require('bcryptjs');
-    const user = await User.findById(req.params.id);
+    const user = await User.findOne({ _id: req.params.id, companyId: req.user.companyId });
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     const crypto = require('crypto');

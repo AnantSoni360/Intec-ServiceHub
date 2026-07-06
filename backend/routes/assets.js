@@ -18,13 +18,13 @@ const mapAsset = (a) => ({
 });
 
 // Get all assets (Admin/Engineer)
-router.get('/', requireRole('Admin', 'Engineer'), async (req, res) => {
+router.get('/', requireRole('Admin', 'super_admin', 'Engineer'), async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 50;
     const skip = (page - 1) * limit;
 
-    const query = {};
+    const query = { companyId: req.user.companyId };
     if (req.query.status && req.query.status !== 'All') query.status = req.query.status;
     if (req.query.type && req.query.type !== 'All') query.type = req.query.type;
     if (req.query.search) {
@@ -56,7 +56,7 @@ router.get('/', requireRole('Admin', 'Engineer'), async (req, res) => {
 router.get('/user/:userId', async (req, res) => {
   try {
     // Ownership check
-    if (req.user.id !== req.params.userId && !['Admin', 'Engineer'].includes(req.user.role)) {
+    if (req.user.id !== req.params.userId && !['Admin', 'super_admin', 'Engineer'].includes(req.user.role)) {
       return res.status(403).json({ message: 'Access Denied: Cannot view other users\' assets' });
     }
 
@@ -64,7 +64,7 @@ router.get('/user/:userId', async (req, res) => {
     const limit = parseInt(req.query.limit) || 50;
     const skip = (page - 1) * limit;
 
-    const query = { assignedTo: req.params.userId };
+    const query = { assignedTo: req.params.userId, companyId: req.user.companyId };
     if (req.query.status && req.query.status !== 'All') query.status = req.query.status;
     if (req.query.type && req.query.type !== 'All') query.type = req.query.type;
     if (req.query.search) {
@@ -93,7 +93,7 @@ router.get('/user/:userId', async (req, res) => {
 });
 
 // Create new asset
-router.post('/', requireRole('Admin', 'Engineer'), async (req, res) => {
+router.post('/', requireRole('Admin', 'super_admin', 'Engineer'), async (req, res) => {
   try {
     const asset = new Asset({
       name: req.body.name,
@@ -101,6 +101,7 @@ router.post('/', requireRole('Admin', 'Engineer'), async (req, res) => {
       serialNumber: req.body.serialNumber,
       status: 'Available',
       assignedTo: null,
+      companyId: req.user.companyId,
       history: [{ action: 'Created', userId: req.user.id }]
     });
     const savedAsset = await asset.save();
@@ -111,7 +112,7 @@ router.post('/', requireRole('Admin', 'Engineer'), async (req, res) => {
 });
 
 // Bulk update assets
-router.post('/bulk/update', requireRole('Admin', 'Engineer'), async (req, res) => {
+router.post('/bulk/update', requireRole('Admin', 'super_admin', 'Engineer'), async (req, res) => {
   try {
     const { assetIds, updateData } = req.body;
     if (!assetIds || !Array.isArray(assetIds) || assetIds.length === 0) {
@@ -134,8 +135,11 @@ router.post('/bulk/update', requireRole('Admin', 'Engineer'), async (req, res) =
       else historyEntry.action = 'Assigned';
     }
     
+    const mongoose = require('mongoose');
+    const objectIds = assetIds.map(id => new mongoose.Types.ObjectId(id));
+
     await Asset.updateMany(
-      { _id: { $in: assetIds } },
+      { _id: mongoose.trusted({ $in: objectIds }), companyId: req.user.companyId },
       { 
         $set: allowedUpdates,
         $push: { history: historyEntry }
@@ -149,14 +153,17 @@ router.post('/bulk/update', requireRole('Admin', 'Engineer'), async (req, res) =
 });
 
 // Bulk delete assets
-router.post('/bulk/delete', requireRole('Admin'), async (req, res) => {
+router.post('/bulk/delete', requireRole('Admin', 'super_admin'), async (req, res) => {
   try {
     const { assetIds } = req.body;
     if (!assetIds || !Array.isArray(assetIds) || assetIds.length === 0) {
       return res.status(400).json({ message: 'No asset IDs provided' });
     }
 
-    await Asset.deleteMany({ _id: { $in: assetIds } });
+    const mongoose = require('mongoose');
+    const objectIds = assetIds.map(id => new mongoose.Types.ObjectId(id));
+
+    await Asset.deleteMany({ _id: mongoose.trusted({ $in: objectIds }), companyId: req.user.companyId });
     res.json({ message: `${assetIds.length} assets deleted successfully` });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
@@ -164,9 +171,9 @@ router.post('/bulk/delete', requireRole('Admin'), async (req, res) => {
 });
 
 // Update asset assignment/status
-router.put('/:id', requireRole('Admin', 'Engineer'), async (req, res) => {
+router.put('/:id', requireRole('Admin', 'super_admin', 'Engineer'), async (req, res) => {
   try {
-    const asset = await Asset.findById(req.params.id);
+    const asset = await Asset.findOne({ _id: req.params.id, companyId: req.user.companyId });
     if (!asset) return res.status(404).json({ message: 'Asset not found' });
 
     let action = 'Updated';

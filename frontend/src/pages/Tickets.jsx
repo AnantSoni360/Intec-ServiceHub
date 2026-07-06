@@ -20,7 +20,6 @@ const Tickets = ({ user }) => {
   // Modals & Panels
   const [showAddModal, setShowAddModal] = useState(false);
   const [newTicket, setNewTicket] = useState({ title: '', description: '', priority: 'Medium', category: 'Other', assetId: '' });
-  const [attachments, setAttachments] = useState(null);
   const [userAssets, setUserAssets] = useState([]);
   
   const [selectedTicket, setSelectedTicket] = useState(null);
@@ -114,34 +113,37 @@ const Tickets = ({ user }) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const formData = new FormData();
-      formData.append('title', newTicket.title);
-      formData.append('description', newTicket.description);
-      formData.append('priority', newTicket.priority);
-      formData.append('category', newTicket.category);
-      if (newTicket.assetId) formData.append('assetId', newTicket.assetId);
-      
-      if (attachments) {
-        for (let i = 0; i < attachments.length; i++) {
-          formData.append('attachments', attachments[i]);
-        }
+      const payload = {
+        title: newTicket.title,
+        description: newTicket.description,
+        priority: newTicket.priority,
+        category: newTicket.category
+      };
+      if (newTicket.assetId) {
+        payload.assetId = newTicket.assetId;
       }
 
       const res = await fetch(`${import.meta.env.VITE_API_URL}/tickets`, {
         method: 'POST',
         headers: { 
+          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}` 
         },
-        body: formData
+        body: JSON.stringify(payload)
       });
+      
       if (res.ok) {
         setShowAddModal(false);
         setNewTicket({ title: '', description: '', priority: 'Medium', category: 'Other', assetId: '' });
-        setAttachments(null);
         fetchTickets();
+      } else {
+        const errData = await res.json();
+        console.error('Failed to create ticket:', errData);
+        alert(errData.message || 'Failed to create ticket');
       }
     } catch (err) {
       console.error(err);
+      alert('An error occurred while creating the ticket');
     }
   };
 
@@ -159,9 +161,14 @@ const Tickets = ({ user }) => {
       if (res.ok) {
         setSelectedTicketIds([]);
         fetchTickets();
+      } else {
+        const err = await res.json();
+        alert(err.message || 'Failed to bulk update');
+        console.error('Bulk update failed', err);
       }
     } catch (err) {
       console.error(err);
+      alert('An error occurred during bulk update');
     }
   };
 
@@ -592,9 +599,11 @@ const Tickets = ({ user }) => {
             <div style={{ fontWeight: 600 }}>{selectedTicketIds.length} Selected</div>
             
             <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <button className="btn" style={{ color: 'var(--color-white)', backgroundColor: 'rgba(255,255,255,0.1)' }} onClick={() => handleBulkUpdate({ status: 'Resolved' })}>
-                Mark Resolved
-              </button>
+              {!(user.role === 'Engineer' && tickets.some(t => selectedTicketIds.includes(t.id) && !t.assignedTo)) && (
+                <button className="btn" style={{ color: 'var(--color-white)', backgroundColor: 'rgba(255,255,255,0.1)' }} onClick={() => handleBulkUpdate({ status: 'Resolved' })}>
+                  Mark Resolved
+                </button>
+              )}
               <button className="btn" style={{ color: 'var(--color-white)', backgroundColor: 'rgba(255,255,255,0.1)' }} onClick={() => handleBulkUpdate({ status: 'In Progress' })}>
                 Mark In Progress
               </button>
@@ -679,10 +688,7 @@ const Tickets = ({ user }) => {
                   {userAssets.map(a => <option key={a._id || a.id} value={a._id || a.id}>{a.name} ({a.serialNumber})</option>)}
                 </select>
               </div>
-              <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-                <label className="form-label">Attachments</label>
-                <input type="file" multiple className="form-input" onChange={e => setAttachments(e.target.files)} />
-              </div>
+
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', borderTop: '1px solid var(--color-gray-border)', paddingTop: '1.5rem' }}>
                 <button type="button" className="btn" onClick={() => setShowAddModal(false)} style={{ backgroundColor: 'var(--color-light-gray)' }}>Cancel</button>
                 <button type="submit" className="btn btn-primary">Submit Ticket</button>

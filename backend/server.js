@@ -66,10 +66,15 @@ mongoose.connect(process.env.MONGO_URI, { family: 4 })
 const authRoutes = require('./routes/auth');
 const ticketRoutes = require('./routes/tickets');
 const assetRoutes = require('./routes/assets');
+const onboardingRoutes = require('./routes/onboarding');
+
+// Serve data templates for onboarding
+app.use('/data_templates', express.static(path.join(__dirname, '../data_templates')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/assets', assetRoutes);
+app.use('/api/onboarding', onboardingRoutes);
 
 // Global error handler for Pino structured logging
 app.use((err, req, res, next) => {

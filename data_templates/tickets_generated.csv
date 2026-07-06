@@ -1,0 +1,201 @@
+Title,Description,Priority,Status,Requested_By_Email,Assigned_To_Email
+New User Account Creation,Create AD account for new employee.,Medium,Resolved,nikhil.joshi22@intec-demo.com,vikram.pandey22@intec-demo.com
+Keyboard Replacement,Wireless keyboard not connecting.,Low,In Progress,vikas.shah22@intec-demo.com,pooja.tiwari99@intec-demo.com
+System Running Slow,Excel takes 10 minutes to open.,Medium,Resolved,karan.mehta1@intec-demo.com,aarti.mehta1@intec-demo.com
+Wi-Fi Connection Problem,Cannot see the office SSID.,Medium,Resolved,rohit.tiwari@intec-demo.com,amit.iyer1@intec-demo.com
+Wi-Fi Connection Problem,Authentication error on corporate Wi-Fi.,High,Resolved,aarti.mehta1@intec-demo.com,aarti.mehta1@intec-demo.com
+Laptop Not Working,Laptop won't power on.,Critical,Resolved,rohit.chopra22@intec-demo.com,vikram.pandey22@intec-demo.com
+Wi-Fi Connection Problem,Authentication error on corporate Wi-Fi.,High,Resolved,shikha.tiwari99@intec-demo.com,ankit.naidu8@intec-demo.com
+New User Account Creation,Onboarding setup required.,High,Resolved,vikram.kulkarni22@intec-demo.com,pooja.tiwari99@intec-demo.com
+Shared Folder Access,Permission denied on Marketing folder.,High,In Progress,ankit.gowda@intec-demo.com,vikram.pandey22@intec-demo.com
+Blue Screen Error,Frequent BSODs today.,High,Resolved,amit.naidu1@intec-demo.com,rohan.iyer@intec-demo.com
+Blue Screen Error,Frequent BSODs today.,High,Resolved,nikhil.pandey99@intec-demo.com,pooja.tiwari99@intec-demo.com
+Shared Folder Access,Permission denied on Marketing folder.,High,Closed,shikha.tiwari99@intec-demo.com,vikram.pandey22@intec-demo.com
+Wi-Fi Connection Problem,Cannot see the office SSID.,Medium,Resolved,sanjay.kulkarni1@intec-demo.com,aarti.mehta1@intec-demo.com
+New User Account Creation,Onboarding setup required.,High,Resolved,rohit.shah8@intec-demo.com,pooja.tiwari99@intec-demo.com
+Password Reset,Need to reset email password.,Critical,Resolved,shikha.tiwari99@intec-demo.com,aarti.mehta1@intec-demo.com
+Wi-Fi Connection Problem,Authentication error on corporate Wi-Fi.,High,Resolved,vikram.iyer@intec-demo.com,aarti.mehta1@intec-demo.com
+New Laptop Request,Old laptop out of warranty.,Low,Resolved,ankit.naidu8@intec-demo.com,shikha.tiwari99@intec-demo.com
+Laptop Not Working,Laptop won't power on.,Critical,Resolved,nisha.nair1@intec-demo.com,pooja.tiwari99@intec-demo.com
+Laptop Not Working,Laptop won't power on.,Critical,Resolved,saurabh.deshmukh99@intec-demo.com,shikha.tiwari99@intec-demo.com
+Password Reset,Need to reset email password.,Critical,Resolved,ankit.naidu8@intec-demo.com,rohit.shah8@intec-demo.com
+Blue Screen Error,Frequent BSODs today.,High,Closed,divya.shah1@intec-demo.com,amit.iyer1@intec-demo.com
+New Laptop Request,Old laptop out of warranty.,Low,Open,deepak.reddy99@intec-demo.com,vikram.pandey22@intec-demo.com
+Application Access Request,Need access to SAP HR module.,Medium,In Progress,vikram.pandey22@intec-demo.com,pooja.tiwari99@intec-demo.com
+Wi-Fi Connection Problem,Cannot see the office SSID.,Medium,Resolved,aditya.mehta99@intec-demo.com,rohit.shah8@intec-demo.com
+Software Installation Request,Requesting VS Code setup.,High,Resolved,shikha.tiwari99@intec-demo.com,vikram.pandey22@intec-demo.com
+Laptop Not Working,Laptop won't power on.,Critical,Resolved,ravi.agarwal22@intec-demo.com,amit.iyer1@intec-demo.com
+Software Installation Request,Requesting VS Code setup.,High,Open,vikram.kulkarni22@intec-demo.com,rohit.chopra1@intec-demo.com
+Application Access Request,Need access to SAP HR module.,Medium,Resolved,nikhil.pandey99@intec-demo.com,pooja.tiwari99@intec-demo.com
+New User Account Creation,Create AD account for new employee.,Medium,In Progress,rohit.patil99@intec-demo.com,aarti.mehta1@intec-demo.com
+New User Account Creation,Onboarding setup required.,High,Resolved,aarti.chopra8@intec-demo.com,amit.iyer1@intec-demo.com
+New User Account Creation,Create AD account for new employee.,Medium,In Progress,deepak.iyer22@intec-demo.com,amit.iyer1@intec-demo.com
+Wi-Fi Connection Problem,Cannot see the office SSID.,Medium,Resolved,deepak.reddy99@intec-demo.com,shikha.tiwari99@intec-demo.com
+Software Installation Request,Requesting VS Code setup.,Low,Closed,aarti.chopra8@intec-demo.com,pooja.tiwari99@intec-demo.com
+Shared Folder Access,Map network drive for Finance.,Medium,Open,aditya.das22@intec-demo.com,
+Wi-Fi Connection Problem,Authentication error on corporate Wi-Fi.,High,Open,rohit.chopra1@intec-demo.com,shikha.tiwari99@intec-demo.com
+Shared Folder Access,Permission denied on Marketing folder.,Low,Resolved,karan.mehta1@intec-demo.com,ankit.naidu8@intec-demo.com
+Application Access Request,Need access to SAP HR module.,Medium,Resolved,aarti.mehta830@intec-demo.com,rohit.shah8@intec-demo.com
+Software Installation Request,Requesting VS Code setup.,Medium,In Progress,rohan.iyer@intec-demo.com,ankit.naidu8@intec-demo.com
+System Running Slow,Excel takes 10 minutes to open.,Critical,Open,aarti.mehta1@intec-demo.com,
+Network Drive Mapping,Need Z drive mapped to my PC.,Medium,Resolved,aditya.das22@intec-demo.com,ankit.naidu8@intec-demo.com
+Network Drive Mapping,Need Z drive mapped to my PC.,Medium,Closed,aarti.das8@intec-demo.com,vikram.pandey22@intec-demo.com
+Shared Folder Access,Map network drive for Finance.,Medium,Open,shruti.joshi@intec-demo.com,pooja.tiwari99@intec-demo.com
+Keyboard Replacement,Wireless keyboard not connecting.,Low,Resolved,vikas.shah22@intec-demo.com,amit.iyer1@intec-demo.com
+Shared Folder Access,Map network drive for Finance.,Medium,Resolved,amit.iyer1@intec-demo.com,rohan.iyer@intec-demo.com
+Application Access Request,Need access to SAP HR module.,Medium,Resolved,karan.mehta1@intec-demo.com,rohan.iyer@intec-demo.com
+Application Access Request,Need access to SAP HR module.,Medium,In Progress,shruti.tiwari1@intec-demo.com,ankit.naidu8@intec-demo.com
+Wi-Fi Connection Problem,Cannot see the office SSID.,Medium,Resolved,rohit.tiwari@intec-demo.com,rohit.shah8@intec-demo.com
+Shared Folder Access,Permission denied on Marketing folder.,High,Closed,aarti.mehta1@intec-demo.com,shikha.tiwari99@intec-demo.com
+New User Account Creation,Onboarding setup required.,High,Open,ankit.kulkarni99@intec-demo.com,
+Keyboard Replacement,Wireless keyboard not connecting.,Low,Resolved,aarti.mehta830@intec-demo.com,ankit.naidu8@intec-demo.com
+Wi-Fi Connection Problem,Authentication error on corporate Wi-Fi.,High,Closed,amit.kumar@intec-demo.com,amit.iyer1@intec-demo.com
+Application Access Request,Need access to SAP HR module.,Medium,In Progress,amit.naidu1@intec-demo.com,amit.iyer1@intec-demo.com
+Software Installation Request,Requesting VS Code setup.,Low,Resolved,vikas.mishra22@intec-demo.com,rohit.chopra1@intec-demo.com
+Software Installation Request,Requesting VS Code setup.,Low,Resolved,aditya.das22@intec-demo.com,rohit.chopra1@intec-demo.com
+New User Account Creation,Create AD account for new employee.,Medium,Resolved,rohan.iyer@intec-demo.com,rohit.chopra1@intec-demo.com
+Shared Folder Access,Permission denied on Marketing folder.,High,Resolved,aditya.das22@intec-demo.com,shikha.tiwari99@intec-demo.com
+Password Reset,Need to reset email password.,Critical,Resolved,priya.tiwari1@intec-demo.com,amit.iyer1@intec-demo.com
+New User Account Creation,Onboarding setup required.,Medium,Closed,vikram.iyer@intec-demo.com,shikha.tiwari99@intec-demo.com
+Shared Folder Access,Permission denied on Marketing folder.,High,Open,pooja.tiwari99@intec-demo.com,aarti.mehta1@intec-demo.com
+Network Drive Mapping,Need Z drive mapped to my PC.,Medium,Closed,amit.chatterjee@intec-demo.com,vikram.pandey22@intec-demo.com
+Wi-Fi Connection Problem,Cannot see the office SSID.,Medium,Resolved,amit.iyer1@intec-demo.com,rohit.shah8@intec-demo.com
+Laptop Not Working,Laptop won't power on.,Critical,Resolved,amit.deshmukh@intec-demo.com,vikram.pandey22@intec-demo.com
+Wi-Fi Connection Problem,Cannot see the office SSID.,Medium,Open,vikram.kulkarni22@intec-demo.com,
+System Running Slow,Excel takes 10 minutes to open.,Medium,Closed,rohan.iyer@intec-demo.com,amit.iyer1@intec-demo.com
+Windows Update Failed,Stuck at 99% for hours.,Medium,Open,karan.mehta1@intec-demo.com,rohit.shah8@intec-demo.com
+System Running Slow,Excel takes 10 minutes to open.,Medium,Resolved,pooja.tiwari99@intec-demo.com,vikram.pandey22@intec-demo.com
+Keyboard Replacement,Wireless keyboard not connecting.,Low,In Progress,nisha.nair1@intec-demo.com,rohit.shah8@intec-demo.com
+New User Account Creation,Create AD account for new employee.,Medium,Resolved,rohit.chopra1@intec-demo.com,aarti.mehta1@intec-demo.com
+Keyboard Replacement,Wireless keyboard not connecting.,Critical,Resolved,sanjay.kulkarni1@intec-demo.com,ankit.naidu8@intec-demo.com
+New User Account Creation,Create AD account for new employee.,Medium,In Progress,nikhil.shah@intec-demo.com,pooja.tiwari99@intec-demo.com
+New User Account Creation,Create AD account for new employee.,Medium,In Progress,gaurav.kulkarni99@intec-demo.com,aarti.mehta1@intec-demo.com
+Shared Folder Access,Permission denied on Marketing folder.,High,Resolved,rohit.patil99@intec-demo.com,ankit.naidu8@intec-demo.com
+Blue Screen Error,Frequent BSODs today.,High,Resolved,shruti.joshi@intec-demo.com,vikram.pandey22@intec-demo.com
+Shared Folder Access,Permission denied on Marketing folder.,High,Open,ankit.kulkarni99@intec-demo.com,pooja.tiwari99@intec-demo.com
+Keyboard Replacement,Wireless keyboard not connecting.,Low,Resolved,aarti.mehta1@intec-demo.com,amit.iyer1@intec-demo.com
+Wi-Fi Connection Problem,Authentication error on corporate Wi-Fi.,High,In Progress,aarti.chopra8@intec-demo.com,amit.iyer1@intec-demo.com
+Software Installation Request,Requesting VS Code setup.,Critical,Resolved,shruti.tiwari1@intec-demo.com,aarti.mehta1@intec-demo.com
+Software Installation Request,Requesting VS Code setup.,Low,In Progress,saurabh.patil@intec-demo.com,rohit.shah8@intec-demo.com
+Shared Folder Access,Map network drive for Finance.,Critical,Closed,saurabh.mehta8@intec-demo.com,shikha.tiwari99@intec-demo.com
+New Laptop Request,Old laptop out of warranty.,Low,Resolved,rajesh.tiwari@intec-demo.com,pooja.tiwari99@intec-demo.com
+Wi-Fi Connection Problem,Authentication error on corporate Wi-Fi.,High,In Progress,rohit.tiwari@intec-demo.com,vikram.pandey22@intec-demo.com
+Application Access Request,Need access to SAP HR module.,Medium,Closed,aarti.das8@intec-demo.com,pooja.tiwari99@intec-demo.com
+Network Drive Mapping,Need Z drive mapped to my PC.,Medium,Resolved,pooja.tiwari99@intec-demo.com,rohan.iyer@intec-demo.com
+Wi-Fi Connection Problem,Cannot see the office SSID.,Medium,Open,ankit.naidu8@intec-demo.com,
+Shared Folder Access,Map network drive for Finance.,Medium,In Progress,rajesh.tiwari@intec-demo.com,rohan.iyer@intec-demo.com
+Software Installation Request,Requesting VS Code setup.,Low,Resolved,amit.naidu1@intec-demo.com,shikha.tiwari99@intec-demo.com
+Shared Folder Access,Permission denied on Marketing folder.,High,Resolved,amit.iyer1@intec-demo.com,vikram.pandey22@intec-demo.com
+New Laptop Request,Old laptop out of warranty.,Low,Resolved,vikram.iyer@intec-demo.com,aarti.mehta1@intec-demo.com
+Application Access Request,Need access to SAP HR module.,Medium,Resolved,rohan.joshi@intec-demo.com,amit.iyer1@intec-demo.com
+Blue Screen Error,Frequent BSODs today.,High,Resolved,aditya.das22@intec-demo.com,rohit.shah8@intec-demo.com
+System Running Slow,Excel takes 10 minutes to open.,Medium,Resolved,rohit.tiwari@intec-demo.com,pooja.tiwari99@intec-demo.com
+Application Access Request,Need access to SAP HR module.,Low,Resolved,rohan.joshi@intec-demo.com,shikha.tiwari99@intec-demo.com
+Shared Folder Access,Permission denied on Marketing folder.,High,Resolved,shikha.tiwari99@intec-demo.com,amit.iyer1@intec-demo.com
+Shared Folder Access,Permission denied on Marketing folder.,High,Resolved,amit.deshmukh@intec-demo.com,aarti.mehta1@intec-demo.com
+Blue Screen Error,Frequent BSODs today.,High,Resolved,aarti.das8@intec-demo.com,ankit.naidu8@intec-demo.com
+Keyboard Replacement,Wireless keyboard not connecting.,Low,In Progress,aditya.das22@intec-demo.com,rohit.chopra1@intec-demo.com
+Password Reset,Need to reset email password.,Critical,Closed,saurabh.patil@intec-demo.com,aarti.mehta1@intec-demo.com
+System Running Slow,Excel takes 10 minutes to open.,Critical,In Progress,kirti.pandey8@intec-demo.com,shikha.tiwari99@intec-demo.com
+Wi-Fi Connection Problem,Cannot see the office SSID.,High,Resolved,kirti.pandey8@intec-demo.com,aarti.mehta1@intec-demo.com
+Password Reset,Need to reset email password.,Medium,Resolved,amit.naidu1@intec-demo.com,amit.iyer1@intec-demo.com
+Shared Folder Access,Permission denied on Marketing folder.,High,Open,saurabh.patil@intec-demo.com,amit.iyer1@intec-demo.com
+Windows Update Failed,Stuck at 99% for hours.,Medium,Resolved,rohit.tiwari@intec-demo.com,shikha.tiwari99@intec-demo.com
+System Running Slow,Excel takes 10 minutes to open.,Medium,Open,nikhil.pandey99@intec-demo.com,
+Windows Update Failed,Stuck at 99% for hours.,Medium,Resolved,shikha.tiwari99@intec-demo.com,aarti.mehta1@intec-demo.com
+System Running Slow,Excel takes 10 minutes to open.,Low,Resolved,rohan.joshi@intec-demo.com,ankit.naidu8@intec-demo.com
+Shared Folder Access,Permission denied on Marketing folder.,High,Resolved,vikram.pandey22@intec-demo.com,amit.iyer1@intec-demo.com
+System Running Slow,Excel takes 10 minutes to open.,Medium,Closed,vikram.iyer@intec-demo.com,aarti.mehta1@intec-demo.com
+System Running Slow,Excel takes 10 minutes to open.,Medium,In Progress,kirti.pandey8@intec-demo.com,rohit.chopra1@intec-demo.com
+Shared Folder Access,Permission denied on Marketing folder.,High,Resolved,vikas.shah22@intec-demo.com,rohit.chopra1@intec-demo.com
+New Laptop Request,Old laptop out of warranty.,Low,In Progress,saurabh.mehta8@intec-demo.com,aarti.mehta1@intec-demo.com
+Network Drive Mapping,Need Z drive mapped to my PC.,Medium,Resolved,rohit.shah8@intec-demo.com,pooja.tiwari99@intec-demo.com
+Wi-Fi Connection Problem,Authentication error on corporate Wi-Fi.,Low,Open,aarti.chopra8@intec-demo.com,
+Laptop Not Working,Laptop won't power on.,Critical,Open,shruti.joshi@intec-demo.com,ankit.naidu8@intec-demo.com
+Password Reset,Need to reset email password.,Critical,Resolved,rohan.joshi@intec-demo.com,vikram.pandey22@intec-demo.com
+Password Reset,Need to reset email password.,Critical,Resolved,rohit.shah8@intec-demo.com,shikha.tiwari99@intec-demo.com
+Laptop Not Working,Laptop won't power on.,Critical,In Progress,ankit.naidu8@intec-demo.com,amit.iyer1@intec-demo.com
+Shared Folder Access,Map network drive for Finance.,High,Resolved,amit.iyer1@intec-demo.com,vikram.pandey22@intec-demo.com
+System Running Slow,Excel takes 10 minutes to open.,Medium,Resolved,vikram.kulkarni22@intec-demo.com,pooja.tiwari99@intec-demo.com
+New User Account Creation,Create AD account for new employee.,Medium,In Progress,amit.deshmukh@intec-demo.com,amit.iyer1@intec-demo.com
+Keyboard Replacement,Wireless keyboard not connecting.,Low,Closed,amit.kumar@intec-demo.com,vikram.pandey22@intec-demo.com
+New User Account Creation,Create AD account for new employee.,Medium,Resolved,shikha.tiwari99@intec-demo.com,pooja.tiwari99@intec-demo.com
+New User Account Creation,Onboarding setup required.,High,Resolved,rohit.patil99@intec-demo.com,shikha.tiwari99@intec-demo.com
+Windows Update Failed,Stuck at 99% for hours.,Critical,Open,nikhil.joshi22@intec-demo.com,ankit.naidu8@intec-demo.com
+New User Account Creation,Create AD account for new employee.,Medium,Resolved,vikram.iyer@intec-demo.com,rohan.iyer@intec-demo.com
+Windows Update Failed,Stuck at 99% for hours.,Medium,Resolved,rohan.joshi@intec-demo.com,shikha.tiwari99@intec-demo.com
+Password Reset,Need to reset email password.,Critical,Resolved,aditya.mehta99@intec-demo.com,amit.iyer1@intec-demo.com
+New Laptop Request,Old laptop out of warranty.,Low,Resolved,rohit.tiwari@intec-demo.com,rohit.shah8@intec-demo.com
+Application Access Request,Need access to SAP HR module.,Medium,Resolved,rohit.tiwari@intec-demo.com,ankit.naidu8@intec-demo.com
+Password Reset,Need to reset email password.,Critical,Resolved,rohit.chopra22@intec-demo.com,ankit.naidu8@intec-demo.com
+New Laptop Request,Old laptop out of warranty.,Low,Open,vikram.kulkarni22@intec-demo.com,vikram.pandey22@intec-demo.com
+Shared Folder Access,Map network drive for Finance.,Medium,Resolved,amit.chatterjee@intec-demo.com,rohit.chopra1@intec-demo.com
+Application Access Request,Need access to SAP HR module.,Medium,Open,shruti.tiwari1@intec-demo.com,
+Software Installation Request,Requesting VS Code setup.,Low,Closed,shruti.tiwari1@intec-demo.com,pooja.tiwari99@intec-demo.com
+Shared Folder Access,Map network drive for Finance.,Medium,Closed,aarti.mehta830@intec-demo.com,rohan.iyer@intec-demo.com
+Shared Folder Access,Map network drive for Finance.,Medium,Resolved,deepak.reddy99@intec-demo.com,rohan.iyer@intec-demo.com
+Windows Update Failed,Stuck at 99% for hours.,High,In Progress,nisha.nair1@intec-demo.com,vikram.pandey22@intec-demo.com
+Password Reset,Need to reset email password.,Critical,Resolved,amit.naidu1@intec-demo.com,rohit.shah8@intec-demo.com
+Windows Update Failed,Stuck at 99% for hours.,Medium,Resolved,divya.shah1@intec-demo.com,rohit.chopra1@intec-demo.com
+Wi-Fi Connection Problem,Authentication error on corporate Wi-Fi.,High,In Progress,shruti.joshi@intec-demo.com,vikram.pandey22@intec-demo.com
+System Running Slow,Excel takes 10 minutes to open.,Medium,Open,amit.naidu1@intec-demo.com,aarti.mehta1@intec-demo.com
+Software Installation Request,Requesting VS Code setup.,Low,In Progress,amit.naidu1@intec-demo.com,rohit.chopra1@intec-demo.com
+Laptop Not Working,Laptop won't power on.,Critical,Resolved,rohan.iyer@intec-demo.com,rohit.shah8@intec-demo.com
+System Running Slow,Excel takes 10 minutes to open.,Medium,Resolved,gaurav.kulkarni99@intec-demo.com,shikha.tiwari99@intec-demo.com
+Application Access Request,Need access to SAP HR module.,Medium,In Progress,saurabh.mehta8@intec-demo.com,pooja.tiwari99@intec-demo.com
+Shared Folder Access,Permission denied on Marketing folder.,High,Closed,rohan.joshi@intec-demo.com,rohan.iyer@intec-demo.com
+Windows Update Failed,Stuck at 99% for hours.,Medium,In Progress,vikram.pandey22@intec-demo.com,rohan.iyer@intec-demo.com
+New User Account Creation,Create AD account for new employee.,High,Resolved,kirti.pandey8@intec-demo.com,rohit.chopra1@intec-demo.com
+Windows Update Failed,Stuck at 99% for hours.,Medium,In Progress,vikas.mishra22@intec-demo.com,rohan.iyer@intec-demo.com
+Password Reset,Need to reset email password.,Critical,Resolved,aarti.das8@intec-demo.com,vikram.pandey22@intec-demo.com
+Shared Folder Access,Permission denied on Marketing folder.,Medium,In Progress,rajesh.tiwari@intec-demo.com,aarti.mehta1@intec-demo.com
+Shared Folder Access,Permission denied on Marketing folder.,High,Resolved,harsh.mishra8@intec-demo.com,rohit.chopra1@intec-demo.com
+New Laptop Request,Old laptop out of warranty.,High,Open,amit.kumar@intec-demo.com,rohit.chopra1@intec-demo.com
+New User Account Creation,Create AD account for new employee.,Medium,Open,priya.tiwari1@intec-demo.com,
+Keyboard Replacement,Wireless keyboard not connecting.,Low,Open,vikram.pandey22@intec-demo.com,amit.iyer1@intec-demo.com
+Windows Update Failed,Stuck at 99% for hours.,Medium,In Progress,rajesh.tiwari@intec-demo.com,pooja.tiwari99@intec-demo.com
+Password Reset,Need to reset email password.,Critical,Closed,karan.mehta1@intec-demo.com,rohit.chopra1@intec-demo.com
+Wi-Fi Connection Problem,Authentication error on corporate Wi-Fi.,Medium,Resolved,deepak.iyer22@intec-demo.com,rohit.shah8@intec-demo.com
+Application Access Request,Need access to SAP HR module.,Medium,In Progress,aarti.mehta830@intec-demo.com,rohan.iyer@intec-demo.com
+Wi-Fi Connection Problem,Authentication error on corporate Wi-Fi.,High,Resolved,vikram.kulkarni22@intec-demo.com,pooja.tiwari99@intec-demo.com
+Password Reset,Need to reset email password.,Critical,Resolved,pooja.tiwari99@intec-demo.com,shikha.tiwari99@intec-demo.com
+System Running Slow,Excel takes 10 minutes to open.,Critical,In Progress,nisha.nair1@intec-demo.com,pooja.tiwari99@intec-demo.com
+Network Drive Mapping,Need Z drive mapped to my PC.,Medium,Resolved,kirti.pandey8@intec-demo.com,amit.iyer1@intec-demo.com
+Blue Screen Error,Frequent BSODs today.,High,Resolved,shikha.tiwari99@intec-demo.com,rohit.chopra1@intec-demo.com
+Network Drive Mapping,Need Z drive mapped to my PC.,Medium,Resolved,nikhil.joshi22@intec-demo.com,vikram.pandey22@intec-demo.com
+Shared Folder Access,Map network drive for Finance.,Medium,Resolved,deepak.iyer22@intec-demo.com,amit.iyer1@intec-demo.com
+Windows Update Failed,Stuck at 99% for hours.,Medium,In Progress,vikas.shah22@intec-demo.com,vikram.pandey22@intec-demo.com
+New User Account Creation,Create AD account for new employee.,Medium,In Progress,aarti.mehta1@intec-demo.com,rohan.iyer@intec-demo.com
+Blue Screen Error,Frequent BSODs today.,High,Resolved,amit.deshmukh@intec-demo.com,rohit.shah8@intec-demo.com
+Keyboard Replacement,Wireless keyboard not connecting.,Low,In Progress,rohan.joshi@intec-demo.com,ankit.naidu8@intec-demo.com
+Password Reset,Need to reset email password.,Critical,Resolved,rajesh.tiwari@intec-demo.com,pooja.tiwari99@intec-demo.com
+New User Account Creation,Create AD account for new employee.,Medium,Open,amit.chatterjee@intec-demo.com,
+Shared Folder Access,Permission denied on Marketing folder.,High,Resolved,rohan.iyer@intec-demo.com,ankit.naidu8@intec-demo.com
+New User Account Creation,Onboarding setup required.,High,Resolved,ankit.naidu8@intec-demo.com,aarti.mehta1@intec-demo.com
+Software Installation Request,Requesting VS Code setup.,Low,Resolved,shikha.tiwari99@intec-demo.com,aarti.mehta1@intec-demo.com
+Wi-Fi Connection Problem,Authentication error on corporate Wi-Fi.,Medium,Resolved,amit.chatterjee@intec-demo.com,amit.iyer1@intec-demo.com
+Shared Folder Access,Map network drive for Finance.,Critical,Open,harsh.mishra8@intec-demo.com,shikha.tiwari99@intec-demo.com
+Software Installation Request,Requesting VS Code setup.,Critical,Open,priya.tiwari1@intec-demo.com,
+Software Installation Request,Requesting VS Code setup.,Low,In Progress,sanjay.kulkarni1@intec-demo.com,vikram.pandey22@intec-demo.com
+New Laptop Request,Old laptop out of warranty.,Medium,Resolved,rajesh.mehta@intec-demo.com,vikram.pandey22@intec-demo.com
+Shared Folder Access,Permission denied on Marketing folder.,High,Resolved,vikram.iyer@intec-demo.com,aarti.mehta1@intec-demo.com
+Windows Update Failed,Stuck at 99% for hours.,Medium,Resolved,divya.shah1@intec-demo.com,amit.iyer1@intec-demo.com
+Laptop Not Working,Laptop won't power on.,Critical,Closed,aditya.das22@intec-demo.com,vikram.pandey22@intec-demo.com
+Application Access Request,Need access to SAP HR module.,Medium,Closed,saurabh.mehta8@intec-demo.com,amit.iyer1@intec-demo.com
+Shared Folder Access,Permission denied on Marketing folder.,High,Closed,nikhil.joshi22@intec-demo.com,ankit.naidu8@intec-demo.com
+System Running Slow,Excel takes 10 minutes to open.,Medium,In Progress,nikhil.shah@intec-demo.com,rohit.shah8@intec-demo.com
+Password Reset,Need to reset email password.,Critical,Resolved,aditya.mehta99@intec-demo.com,ankit.naidu8@intec-demo.com
+Application Access Request,Need access to SAP HR module.,Medium,Resolved,amit.chatterjee@intec-demo.com,rohan.iyer@intec-demo.com
+New User Account Creation,Onboarding setup required.,Low,Open,gaurav.kulkarni99@intec-demo.com,
+Blue Screen Error,Frequent BSODs today.,High,Open,ankit.naidu8@intec-demo.com,rohit.shah8@intec-demo.com
+Wi-Fi Connection Problem,Authentication error on corporate Wi-Fi.,High,Open,aditya.das22@intec-demo.com,
+Wi-Fi Connection Problem,Authentication error on corporate Wi-Fi.,High,Closed,ankit.gowda@intec-demo.com,pooja.tiwari99@intec-demo.com
+Shared Folder Access,Map network drive for Finance.,Medium,Closed,gaurav.kulkarni99@intec-demo.com,ankit.naidu8@intec-demo.com
+New User Account Creation,Create AD account for new employee.,Medium,In Progress,vikram.pandey22@intec-demo.com,amit.iyer1@intec-demo.com
+Laptop Not Working,Laptop won't power on.,Critical,Open,amit.iyer1@intec-demo.com,
+Shared Folder Access,Map network drive for Finance.,Medium,Resolved,nikhil.pandey99@intec-demo.com,vikram.pandey22@intec-demo.com
+Network Drive Mapping,Need Z drive mapped to my PC.,Medium,Resolved,ankit.gowda@intec-demo.com,rohan.iyer@intec-demo.com
+System Running Slow,Excel takes 10 minutes to open.,Low,Resolved,priya.tiwari1@intec-demo.com,ankit.naidu8@intec-demo.com
+System Running Slow,Excel takes 10 minutes to open.,Medium,In Progress,aarti.mehta1@intec-demo.com,aarti.mehta1@intec-demo.com
+Software Installation Request,Requesting VS Code setup.,Low,Resolved,saurabh.patil@intec-demo.com,rohit.shah8@intec-demo.com
+New Laptop Request,Old laptop out of warranty.,Low,Resolved,rajesh.mehta@intec-demo.com,aarti.mehta1@intec-demo.com

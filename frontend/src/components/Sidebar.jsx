@@ -1,8 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Ticket, Laptop, Users, ChevronsRight, Settings, BookOpen } from 'lucide-react';
 
-const Sidebar = ({ role }) => {
+const Sidebar = ({ user }) => {
   const location = useLocation();
+  const role = user?.role || 'Employee';
+  const companyName = user?.companyName || 'Intec';
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={22} /> },
@@ -10,13 +12,13 @@ const Sidebar = ({ role }) => {
     { name: 'Knowledge Base', path: '/knowledge', icon: <BookOpen size={22} /> },
   ];
 
-  if (role === 'Admin' || role === 'Engineer') {
+  if (role === 'Admin' || role === 'super_admin' || role === 'Engineer') {
     navItems.push({ name: 'Assets', path: '/assets', icon: <Laptop size={22} /> });
   } else {
     navItems.push({ name: 'My Assets', path: '/assets', icon: <Laptop size={22} /> });
   }
 
-  if (role === 'Admin') {
+  if (role === 'Admin' || role === 'super_admin') {
     navItems.push({ name: 'Users', path: '/users', icon: <Users size={22} /> });
   }
 
@@ -27,8 +29,8 @@ const Sidebar = ({ role }) => {
     <div className="sidebar">
       <div className="sidebar-header" style={{ justifyContent: 'center' }}>
         <div className="sidebar-logo">
-          <div style={{ background: 'var(--color-azure)', color: 'white', padding: '0.2rem 0.6rem', borderRadius: '8px', fontSize: '1rem', fontWeight: 700 }}>Intec</div>
-          <span>ServiceHub</span>
+          <div style={{ background: 'var(--color-azure)', color: 'white', padding: '0.2rem 0.6rem', borderRadius: '8px', fontSize: '1rem', fontWeight: 700 }}>{companyName}</div>
+          <span>Portal</span>
         </div>
         {/* We keep an icon visible when collapsed, but here we just hide the text via css on hover */}
       </div>

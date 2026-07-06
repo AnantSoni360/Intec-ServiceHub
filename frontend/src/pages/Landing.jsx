@@ -64,7 +64,7 @@ const Landing = () => {
               The unified Enterprise IT Service Desk & Asset Management Platform designed for modern organizations. Resolve issues faster and keep your team productive.
             </p>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-              <Link to="/login" className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.1rem', borderRadius: '999px', boxShadow: '0 10px 25px -5px rgba(37,99,235,0.4)' }}>
+              <Link to="/onboarding" className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.1rem', borderRadius: '999px', boxShadow: '0 10px 25px -5px rgba(37,99,235,0.4)' }}>
                 Start Free Trial <ChevronRight size={20} />
               </Link>
               <button className="btn" style={{ padding: '1rem 2rem', fontSize: '1.1rem', borderRadius: '999px', backgroundColor: 'white', border: '1px solid var(--color-gray-border)' }}>
@@ -301,7 +301,7 @@ const Landing = () => {
           <div style={{ maxWidth: '800px', margin: '0 auto', background: 'linear-gradient(135deg, #F0F5FF, #F3F4F6)', padding: '5rem 3rem', borderRadius: '32px', border: '1px solid var(--color-gray-border)' }}>
             <h2 style={{ fontSize: '2.5rem', color: 'var(--color-navy)', marginBottom: '1.5rem' }}>Ready to transform your IT desk?</h2>
             <p style={{ fontSize: '1.125rem', color: 'var(--color-text-muted)', marginBottom: '3rem' }}>Join thousands of organizations delivering exceptional employee experiences.</p>
-            <Link to="/login" className="btn btn-primary" style={{ padding: '1.25rem 3rem', fontSize: '1.25rem', borderRadius: '999px', boxShadow: '0 10px 25px -5px rgba(37,99,235,0.4)' }}>
+            <Link to="/onboarding" className="btn btn-primary" style={{ padding: '1.25rem 3rem', fontSize: '1.25rem', borderRadius: '999px', boxShadow: '0 10px 25px -5px rgba(37,99,235,0.4)' }}>
               Get Started for Free
             </Link>
           </div>

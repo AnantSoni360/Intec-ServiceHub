@@ -1,16 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Network, Eye, EyeOff } from 'lucide-react';
 import { GoogleLogin } from '@react-oauth/google';
 
 const Login = ({ onLogin }) => {
+  const [companies, setCompanies] = useState([]);
+  const [selectedCompanyId, setSelectedCompanyId] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/companies`);
+        const data = await response.json();
+        if (data.success) {
+          setCompanies(data.data);
+          if (data.data.length > 0) {
+            setSelectedCompanyId(data.data[0]._id);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch companies', err);
+      }
+    };
+    fetchCompanies();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,7 +41,7 @@ const Login = ({ onLogin }) => {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
+          body: JSON.stringify({ email, password, companyId: selectedCompanyId })
         });
         const data = await response.json();
         if (data.success) {
@@ -46,7 +66,7 @@ const Login = ({ onLogin }) => {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: credentialResponse.credential })
+        body: JSON.stringify({ token: credentialResponse.credential, companyId: selectedCompanyId })
       });
       const data = await response.json();
       if (data.success) {
@@ -116,6 +136,20 @@ const Login = ({ onLogin }) => {
           </div>
 
           <form onSubmit={handleSubmit}>
+            <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+              <label className="form-label" style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-navy)', display: 'block', marginBottom: '0.5rem' }}>Company Workspace</label>
+              <select 
+                className="form-select"
+                value={selectedCompanyId}
+                onChange={(e) => setSelectedCompanyId(e.target.value)}
+                required
+              >
+                <option value="" disabled>Select your company</option>
+                {companies.map(c => (
+                  <option key={c._id} value={c._id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
             <div className="form-group" style={{ marginBottom: '1.5rem' }}>
               <label className="form-label" style={{ fontSize: '0.875rem' }}>Corporate Email</label>
               <input
@@ -187,14 +221,17 @@ const Login = ({ onLogin }) => {
             </div>
           </div>
 
-          <div style={{ marginTop: '2.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--color-gray-border)', fontSize: '0.75rem', color: 'var(--color-text-muted)', textAlign: 'center' }}>
-            <p style={{ marginBottom: '0.5rem', fontWeight: '600' }}>Demo Accounts Available:</p>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-              <span className="badge badge-neutral">karan.nair8@intec-demo.com (Employee)</span>
-              <span className="badge badge-neutral">rohan.gowda1@intec-demo.com (Engineer)</span>
-              <span className="badge badge-neutral">kavita.reddy@intec-demo.com (Admin)</span>
+            <div style={{ marginTop: '2.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--color-gray-border)', fontSize: '0.75rem', color: 'var(--color-text-muted)', textAlign: 'center' }}>
+              <p style={{ marginBottom: '1rem', fontSize: '0.9rem' }}>
+                Don't have a portal yet? <span onClick={() => navigate('/onboarding')} style={{ color: 'var(--color-azure)', cursor: 'pointer', fontWeight: '600' }}>Create a new Company Portal</span>
+              </p>
+              <p style={{ marginBottom: '0.5rem', fontWeight: '600' }}>Demo Accounts Available:</p>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                <span className="badge badge-neutral">karan.nair8@intec-demo.com (Employee)</span>
+                <span className="badge badge-neutral">rohan.gowda1@intec-demo.com (Engineer)</span>
+                <span className="badge badge-neutral">kavita.reddy@intec-demo.com (Admin)</span>
+              </div>
             </div>
-          </div>
         </motion.div>
       </div>
     </div>

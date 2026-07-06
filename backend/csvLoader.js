@@ -17,9 +17,9 @@ function loadCSV(filePath) {
 
 async function initializeData() {
   try {
-    let rawUsers = await loadCSV(path.join(dataTemplatesDir, 'users.csv'));
-    let rawTickets = await loadCSV(path.join(dataTemplatesDir, 'tickets.csv'));
-    let rawAssets = await loadCSV(path.join(dataTemplatesDir, 'assets.csv'));
+    let rawUsers = await loadCSV(path.join(dataTemplatesDir, 'users_generated.csv'));
+    let rawTickets = await loadCSV(path.join(dataTemplatesDir, 'tickets_generated.csv'));
+    let rawAssets = await loadCSV(path.join(dataTemplatesDir, 'assets_generated.csv'));
 
     // Limit records as requested by user
     rawUsers = rawUsers.slice(0, 250);

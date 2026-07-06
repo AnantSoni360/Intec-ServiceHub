@@ -13,6 +13,7 @@ import KnowledgeBase from './pages/KnowledgeBase';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import CommandCenterLoader from './components/CommandCenterLoader';
+import Onboarding from './pages/Onboarding';
 import './index.css';
 
 // Wrapper for animated page transitions
@@ -84,12 +85,13 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={!user ? <Landing /> : <Navigate to="/dashboard" />} />
         <Route path="/login" element={!user ? <Login onLogin={handleLogin} /> : <Navigate to="/dashboard" />} />
+        <Route path="/onboarding" element={!user ? <Onboarding /> : <Navigate to="/dashboard" />} />
 
         {/* Protected Routes (Shell) */}
         <Route path="/*" element={
           user ? (
             <div className="app-container">
-              <Sidebar role={user.role} />
+              <Sidebar user={user} />
               <div className="main-content">
                 <Navbar user={user} onLogout={handleLogout} theme={theme} toggleTheme={toggleTheme} />
                 <div className="page-content">

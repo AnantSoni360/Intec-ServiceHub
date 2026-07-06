@@ -14,6 +14,7 @@ const ticketSchema = new mongoose.Schema({
   requestedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   assetId: { type: mongoose.Schema.Types.ObjectId, ref: 'Asset', default: null },
+  companyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', required: true },
   dueDate: { type: Date, default: null },
   slaBreached: { type: Boolean, default: false },
   attachments: [attachmentSchema],
@@ -24,6 +25,8 @@ const ticketSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
   }]
 }, { timestamps: true });
+
+ticketSchema.index({ companyId: 1 });
 
 ticketSchema.index({ requestedBy: 1 });
 ticketSchema.index({ assignedTo: 1 });

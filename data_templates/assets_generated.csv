@@ -1,0 +1,76 @@
+Asset_Name,Asset_Type,Serial_Number,Status,Assigned_To_Email
+Lenovo ThinkPad T14,Laptop,PFF-062980,Assigned,gaurav.kulkarni99@intec-demo.com
+Dell OptiPlex 7090,Desktop,DYO-478104,Assigned,rohit.chopra1@intec-demo.com
+Fortinet FortiGate 60F,Firewall,RZC-438214,Assigned,divya.chopra1@intec-demo.com
+Dell Precision 3650,Desktop,LWO-098998,Assigned,deepak.reddy99@intec-demo.com
+Lenovo ThinkCentre M70q,Desktop,XEA-397267,Assigned,gaurav.kulkarni99@intec-demo.com
+HP E243,Monitor,EFB-703049,Assigned,vikram.iyer@intec-demo.com
+Grandstream GXP2140,IP Phone,WBB-849550,Assigned,gaurav.kulkarni99@intec-demo.com
+Samsung Odyssey G5,Monitor,YFS-236237,Assigned,rohit.chopra1@intec-demo.com
+LG 27UK850-W,Monitor,BFG-988318,Assigned,amit.kumar@intec-demo.com
+CyberPower CP1500PFCLCD,UPS,ROY-182871,Assigned,harsh.mishra8@intec-demo.com
+HP E243,Monitor,RWN-290680,Assigned,shruti.tiwari1@intec-demo.com
+Samsung Odyssey G5,Monitor,ELS-519610,Assigned,vikram.pandey22@intec-demo.com
+Lenovo ThinkPad T14,Laptop,BJY-903663,Assigned,priya.tiwari1@intec-demo.com
+CyberPower CP1500PFCLCD,UPS,YGE-714197,Assigned,gaurav.kulkarni99@intec-demo.com
+Fortinet FortiGate 60F,Firewall,GUC-882843,Assigned,ankit.gowda@intec-demo.com
+HP EliteBook 840,Laptop,FIW-926395,Available,
+Dell XPS 15,Laptop,EZG-147365,Assigned,shikha.tiwari99@intec-demo.com
+Lenovo ThinkPad T14,Laptop,SAY-577630,Assigned,aarti.mehta1@intec-demo.com
+LG 27UK850-W,Monitor,SHI-442149,Assigned,deepak.iyer22@intec-demo.com
+Samsung Odyssey G5,Monitor,KVH-276346,Assigned,aarti.mehta830@intec-demo.com
+Lenovo ThinkPad T14,Laptop,HRQ-092381,Assigned,rohan.iyer@intec-demo.com
+LG 27UK850-W,Monitor,LXO-733168,Available,
+Epson WorkForce ES-500W,Scanner,FUS-459114,Assigned,vikram.pandey22@intec-demo.com
+BenQ GW2480,Monitor,PSN-858742,Assigned,shruti.joshi@intec-demo.com
+HP EliteBook 840,Laptop,MGL-723801,Assigned,amit.chatterjee@intec-demo.com
+LG 27UK850-W,Monitor,KIM-083790,Available,
+BenQ GW2480,Monitor,AJT-894756,Assigned,ankit.gowda@intec-demo.com
+Dell XPS 15,Laptop,AIR-414160,Assigned,shikha.tiwari99@intec-demo.com
+LG 27UK850-W,Monitor,QDM-032373,Assigned,priya.tiwari1@intec-demo.com
+Lenovo ThinkPad T14,Laptop,MTB-920900,Assigned,sanjay.kulkarni1@intec-demo.com
+HP E243,Monitor,DRO-267167,Assigned,rohit.shah8@intec-demo.com
+Grandstream GXP2140,IP Phone,PYO-939158,Assigned,amit.naidu1@intec-demo.com
+LG 27UK850-W,Monitor,UOB-560604,Assigned,aditya.mehta99@intec-demo.com
+Grandstream GXP2140,IP Phone,SLT-928544,Assigned,divya.chopra1@intec-demo.com
+Dell Precision 3650,Desktop,VCW-246308,Assigned,harsh.mishra8@intec-demo.com
+Lenovo ThinkCentre M70q,Desktop,IWS-209074,Assigned,amit.naidu1@intec-demo.com
+Dell OptiPlex 7090,Desktop,MUC-263545,Assigned,aarti.mehta830@intec-demo.com
+Samsung Odyssey G5,Monitor,SHG-111571,Assigned,rohan.iyer@intec-demo.com
+HP EliteBook 840,Laptop,ZNH-112105,Assigned,vikram.iyer@intec-demo.com
+HP E243,Monitor,QTC-024392,Available,
+Lenovo ThinkPad T14,Laptop,KBQ-015391,Assigned,ankit.naidu8@intec-demo.com
+HP E243,Monitor,UJX-254509,Assigned,rohit.chopra22@intec-demo.com
+Lenovo ThinkPad T14,Laptop,GCG-514640,Assigned,rajesh.tiwari@intec-demo.com
+BenQ GW2480,Monitor,BGG-758112,Assigned,divya.chopra1@intec-demo.com
+LG 27UK850-W,Monitor,BUP-894434,Assigned,saurabh.mehta8@intec-demo.com
+Dell Precision 3650,Desktop,PXT-602685,Assigned,rohit.chopra22@intec-demo.com
+Samsung Odyssey G5,Monitor,OTE-542948,Retired,
+Lenovo ThinkCentre M70q,Desktop,IRW-362985,Assigned,ravi.agarwal22@intec-demo.com
+Lenovo ThinkPad T14,Laptop,ZKN-965413,Assigned,shruti.joshi@intec-demo.com
+Dell Precision 3650,Desktop,FOY-461962,Assigned,vikram.pandey22@intec-demo.com
+Dell XPS 15,Laptop,CZX-418475,Assigned,rohan.iyer@intec-demo.com
+CyberPower CP1500PFCLCD,UPS,LDE-571078,Assigned,rohit.patil99@intec-demo.com
+Lenovo ThinkPad T14,Laptop,HHP-941535,Assigned,rohit.chopra1@intec-demo.com
+Grandstream GXP2140,IP Phone,ZGJ-843493,Retired,
+HP E243,Monitor,MAN-588454,Assigned,priya.tiwari1@intec-demo.com
+Fortinet FortiGate 60F,Firewall,BUG-630365,Retired,
+BenQ GW2480,Monitor,WAB-699740,Assigned,vikram.kulkarni22@intec-demo.com
+Dell OptiPlex 7090,Desktop,HAI-034246,Assigned,deepak.iyer22@intec-demo.com
+Dell XPS 15,Laptop,QGX-142208,Available,
+HP E243,Monitor,BYZ-296439,Available,
+Dell XPS 15,Laptop,OOZ-296256,Assigned,vikram.iyer@intec-demo.com
+Epson WorkForce ES-500W,Scanner,VXU-282127,Assigned,rohan.joshi@intec-demo.com
+LG 27UK850-W,Monitor,XQI-457027,Assigned,shruti.tiwari1@intec-demo.com
+Samsung Odyssey G5,Monitor,NXV-284873,Assigned,ankit.kulkarni99@intec-demo.com
+Lenovo ThinkPad T14,Laptop,WSZ-983705,Assigned,rohan.joshi@intec-demo.com
+Samsung Odyssey G5,Monitor,PVY-120859,Assigned,ankit.kulkarni99@intec-demo.com
+BenQ GW2480,Monitor,XHK-193408,Assigned,rohit.chopra1@intec-demo.com
+Dell OptiPlex 7090,Desktop,SOP-786869,Assigned,amit.naidu1@intec-demo.com
+Lenovo ThinkCentre M70q,Desktop,LGJ-939602,Retired,
+Grandstream GXP2140,IP Phone,CFQ-903972,Available,
+HP E243,Monitor,VGU-752995,Assigned,nisha.nair1@intec-demo.com
+LG 27UK850-W,Monitor,DJU-502141,Assigned,aditya.das22@intec-demo.com
+LG 27UK850-W,Monitor,LFP-796360,Retired,
+Dell PowerEdge R740,Server,RMX-006026,Assigned,ravi.agarwal22@intec-demo.com
+Dell OptiPlex 7090,Desktop,NLP-078677,Assigned,aditya.das22@intec-demo.com

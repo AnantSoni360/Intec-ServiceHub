@@ -5,11 +5,12 @@ const { initializeData } = require('./csvLoader');
 const User = require('./models/User');
 const Ticket = require('./models/Ticket');
 const Asset = require('./models/Asset');
+const Company = require('./models/Company');
 
 async function seedDatabase() {
   try {
     if (process.env.NODE_ENV === 'production') {
-      console.error('FATAL ERROR: Refusing to run seed script in production environment. This would wipe all data.');
+      console.error('FATAL ERROR: Refusing to run seed script in production environment.');
       process.exit(1);
     }
 
@@ -22,44 +23,59 @@ async function seedDatabase() {
     await mongoose.connect(process.env.MONGO_URI, { family: 4 });
     console.log('Connected to MongoDB.');
 
-    console.log('Clearing existing collections...');
-    await User.deleteMany({});
-    await Ticket.deleteMany({});
-    await Asset.deleteMany({});
+    // We will ONLY seed data for the "Intec ServiceHub" company to avoid wiping other companies
+    const company = await Company.findOne({ name: 'Intec ServiceHub' });
+    if (!company) {
+      console.error('Error: Intec ServiceHub company not found. Run seedDemo.js first.');
+      process.exit(1);
+    }
+
+    console.log(`Clearing existing users, tickets and assets for company: ${company._id}`);
+    await User.deleteMany({ companyId: company._id });
+    await Ticket.deleteMany({ companyId: company._id });
+    await Asset.deleteMany({ companyId: company._id });
     
     console.log('Loading CSV data...');
     const data = await initializeData();
 
     console.log('Seeding Users...');
+    // We already have some demo users from seedDemo.js, but let's grab the rest of the CSV users
     const bcrypt = require('bcryptjs');
     const defaultPassword = await bcrypt.hash('password123', 10);
-    const createdUsers = await User.insertMany(data.users.map(u => ({
-      name: u.name,
-      email: u.email,
-      password: defaultPassword,
-      role: u.role,
-      department: u.department
-    })));
+    
+    // Check which users already exist for this company
+    const existingUsers = await User.find({ companyId: company._id });
+    const existingEmails = new Set(existingUsers.map(u => u.email));
 
-    // Create a map of email to MongoDB ObjectId
+    const newUsersToInsert = data.users
+      .filter(u => !existingEmails.has(u.email))
+      .map(u => ({
+        name: u.name,
+        email: u.email,
+        password: defaultPassword,
+        role: u.role,
+        department: u.department,
+        companyId: company._id
+      }));
+
+    if (newUsersToInsert.length > 0) {
+      await User.insertMany(newUsersToInsert);
+    }
+
+    // Refetch all users to build map
+    const allUsers = await User.find({ companyId: company._id });
     const userMap = {};
-    createdUsers.forEach(u => {
+    allUsers.forEach(u => {
       userMap[u.email] = u._id;
     });
 
     console.log('Seeding Tickets...');
-    // We need to reload tickets directly from CSV mapping because initializeData gave them our old internal IDs 
-    // Wait, let's just use initializeData's users mapping? No, initializeData returned users with string IDs.
-    // Let's modify seed.js to map original emails if possible. 
-    // Actually, initializeData in csvLoader maps requestedBy and assignedTo to the old internal ID.
-    // It's easier to find the old ID to email, then email to new Mongo ID.
     const oldIdToEmail = {};
     data.users.forEach(u => {
       oldIdToEmail[u.id] = u.email;
     });
 
-    // We need to fallback orphaned tickets to a default user since we truncated the users list to 250
-    const fallbackUserId = createdUsers[0]._id; // Default to John Doe
+    const fallbackUserId = allUsers[0]._id;
 
     const ticketsToInsert = data.tickets.map(t => {
       const requestedEmail = oldIdToEmail[t.requestedBy];
@@ -71,7 +87,8 @@ async function seedDatabase() {
         status: t.status,
         createdAt: t.createdAt,
         requestedBy: userMap[requestedEmail] || fallbackUserId,
-        assignedTo: userMap[assignedEmail] || null
+        assignedTo: userMap[assignedEmail] || null,
+        companyId: company._id
       };
     });
 
@@ -85,13 +102,14 @@ async function seedDatabase() {
         type: ['Laptop', 'Desktop', 'Printer', 'Network', 'Monitor'].includes(a.type) ? a.type : (a.type === 'Server' ? 'Network' : 'Other'),
         serialNumber: a.serialNumber,
         status: a.status === 'Under Maintenance' ? 'Maintenance' : (['Available', 'Assigned', 'Maintenance', 'Retired'].includes(a.status) ? a.status : 'Available'),
-        assignedTo: userMap[assignedEmail] || null
+        assignedTo: userMap[assignedEmail] || null,
+        companyId: company._id
       };
     });
 
     await Asset.insertMany(assetsToInsert);
 
-    console.log(`Successfully seeded ${createdUsers.length} Users, ${ticketsToInsert.length} Tickets, and ${assetsToInsert.length} Assets.`);
+    console.log(`Successfully seeded ${newUsersToInsert.length} additional Users, ${ticketsToInsert.length} Tickets, and ${assetsToInsert.length} Assets for Intec ServiceHub.`);
     process.exit(0);
   } catch (error) {
     console.error('Seeding error:', error);
