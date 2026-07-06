@@ -15,7 +15,7 @@
 - **Frontend**: React.js, Vite, React Router, Framer Motion (for dynamic animations), Lucide React (for iconography).
 - **Backend**: Node.js, Express.js.
 - **Database**: MongoDB (Mongoose ORM).
-- **Security**: JWT Authentication, bcryptjs, express-rate-limit, strict CORS policies.
+- **Security**: JWT Authentication, bcryptjs, express-rate-limit, strict CORS policies, Mongoose strict sanitization (NoSQL injection prevention).
 
 ## 📦 Prerequisites
 
@@ -23,7 +23,7 @@ Before you begin, ensure you have the following installed on your system:
 - [Node.js](https://nodejs.org/) (v16.0 or higher)
 - [MongoDB](https://www.mongodb.com/) (Local installation or MongoDB Atlas Cloud account)
 
-## ⚙️ Installation & Setup
+## ⚙️ Local Installation & Setup
 
 ### 1. Clone the repository
 
@@ -75,11 +75,31 @@ npm run dev
 
 Open your browser and navigate to `http://localhost:5173`. You can log in using one of the pre-configured demo accounts or register a new one.
 
+## 🌐 Production Deployment (Vercel & Railway)
+
+Intec ServiceHub is architected to seamlessly deploy to serverless platforms.
+
+### 1. Backend (Railway)
+- Create a new project in Railway and link it to this GitHub repository (pointing to the `backend/` directory).
+- Set the following Environment Variables in Railway:
+  - `NODE_ENV = production`
+  - `MONGO_URI = <Your Production MongoDB Atlas String>`
+  - `JWT_SECRET = <A secure random string>`
+  - `FRONTEND_URL = <Your exact Vercel URL, e.g., https://intec-servicehub.vercel.app>`
+
+### 2. Frontend (Vercel)
+- Create a new project in Vercel and link it to this GitHub repository.
+- Set the Framework Preset to **Vite**.
+- Override the Root Directory to `frontend`.
+- Set the following Environment Variable in Vercel:
+  - `VITE_API_URL = <Your Railway Backend URL>/api` *(e.g., https://intec-backend.up.railway.app/api)*
+
 ## 🔒 Security Posture
 
 This application has been hardened for production environments:
+- **NoSQL Injection Prevention**: Enabled strict Mongoose query sanitization (`sanitizeFilter: true`) to actively block $in, $ne, and other malicious operator injections.
 - **Rate Limiting**: Brute-force protections are enabled on all `/api` routes via `express-rate-limit`.
-- **CORS Restricted**: The backend strictly only accepts requests from the designated `FRONTEND_URL`.
+- **CORS Restricted**: The backend strictly only accepts requests from the designated `FRONTEND_URL`, dynamically trimming any malformed trailing slashes.
 - **Dynamic Environments**: No hardcoded API endpoints; the frontend automatically routes traffic based on environment variables for seamless local-to-production deployment.
 
 ## 📄 License
