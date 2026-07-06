@@ -480,7 +480,8 @@ const Assets = ({ user }) => {
 
       {/* Content Area */}
       {viewMode === 'list' ? (
-        <div className="card table-container" style={{ padding: 0, minHeight: '400px' }}>
+        <div className="card table-container" style={{ padding: 0, overflow: 'hidden' }}>
+        <div className="table-responsive-wrapper">
           <table>
             <thead>
               <tr>
@@ -519,6 +520,7 @@ const Assets = ({ user }) => {
               ))}
             </tbody>
           </table>
+        </div>
           {currentAssets.length === 0 && (
              <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--color-text-muted)' }}>
                <Search size={48} style={{ opacity: 0.2, margin: '0 auto 1rem' }} />
@@ -606,12 +608,11 @@ const Assets = ({ user }) => {
 
       {/* Add Asset Modal */}
       {showAddModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
+        <div className="modal-overlay">
           <motion.div 
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="card" 
-            style={{ width: '100%', maxWidth: '500px', margin: '2rem' }}
+            className="card modal-content" 
           >
             <h2 className="card-title" style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>Add New Asset</h2>
             <form onSubmit={handleCreateAsset}>

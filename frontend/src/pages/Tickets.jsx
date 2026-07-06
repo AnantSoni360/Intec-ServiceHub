@@ -483,7 +483,8 @@ const Tickets = ({ user }) => {
 
       {/* Table Content Area */}
       <div className="card table-container" style={{ padding: 0, minHeight: '400px', position: 'relative' }}>
-        <table>
+        <div className="table-responsive-wrapper">
+          <table>
           <thead>
             <tr>
               {(user.role === 'Admin' || user.role === 'Engineer') && (
@@ -563,6 +564,7 @@ const Tickets = ({ user }) => {
             ))}
           </tbody>
         </table>
+        </div>
         {currentTickets.length === 0 && (
            <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--color-text-muted)' }}>
              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎫</div>
@@ -646,12 +648,11 @@ const Tickets = ({ user }) => {
 
       {/* Raise Ticket Modal */}
       {showAddModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
+        <div className="modal-overlay">
           <motion.div 
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="card" 
-            style={{ width: '100%', maxWidth: '500px', margin: '2rem' }}
+            className="card modal-content" 
           >
             <h2 className="card-title" style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>Raise a Ticket</h2>
             <form onSubmit={handleCreateTicket}>

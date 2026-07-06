@@ -37,6 +37,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -50,6 +51,9 @@ function App() {
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
   };
+
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  const closeSidebar = () => setSidebarOpen(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -91,10 +95,11 @@ function App() {
         <Route path="/*" element={
           user ? (
             <div className="app-container">
-              <Sidebar user={user} />
+              {sidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar}></div>}
+              <Sidebar user={user} isOpen={sidebarOpen} onClose={closeSidebar} />
               <div className="main-content">
-                <Navbar user={user} onLogout={handleLogout} theme={theme} toggleTheme={toggleTheme} />
-                <div className="page-content">
+                <Navbar user={user} onLogout={handleLogout} theme={theme} toggleTheme={toggleTheme} onToggleSidebar={toggleSidebar} />
+                <div className="page-content" onClick={() => sidebarOpen && closeSidebar()}>
                   <AnimatePresence mode="wait">
                     <Routes>
                       <Route path="/dashboard" element={<PageWrapper><Dashboard user={user} /></PageWrapper>} />

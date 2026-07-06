@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, Search, Settings, LogOut, Moon, Sun } from 'lucide-react';
+import { Bell, Search, Settings, LogOut, Moon, Sun, Menu } from 'lucide-react';
 
-const Navbar = ({ user, onLogout, theme, toggleTheme }) => {
+const Navbar = ({ user, onLogout, theme, toggleTheme, onToggleSidebar }) => {
   const [showDropdown, setShowDropdown] = useState(false);
 
   // Generate initials for avatar
@@ -10,10 +10,15 @@ const Navbar = ({ user, onLogout, theme, toggleTheme }) => {
 
   return (
     <div className="topbar">
-      {/* Search */}
-      <div className="search-bar">
-        <Search size={18} color="var(--color-text-muted)" />
-        <input type="text" placeholder="Search tickets, assets..." className="search-input" />
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <button className="mobile-menu-btn" onClick={onToggleSidebar} style={{ background: 'none', border: 'none', color: 'var(--color-navy)', cursor: 'pointer', display: 'none' }}>
+          <Menu size={24} />
+        </button>
+        {/* Search */}
+        <div className="search-bar">
+          <Search size={18} color="var(--color-text-muted)" />
+          <input type="text" placeholder="Search..." className="search-input" />
+        </div>
       </div>
 
       {/* Right Actions */}

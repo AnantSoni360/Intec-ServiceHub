@@ -83,10 +83,21 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden' }}>
+    <>
+      <div style={{ position: 'fixed', top: 20, right: 20, zIndex: 1000 }}>
+        {error && (
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="alert alert-error">
+            {error}
+          </motion.div>
+        )}
+      </div>
       
-      {/* Left Side - Animated Graphic */}
-      <div style={{ flex: 1, background: 'linear-gradient(135deg, var(--color-navy) 0%, var(--color-azure) 100%)', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+      <div className="split-layout" style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--color-navy)', overflow: 'hidden' }}>
+      
+      {/* Left Side - Animated Branding */}
+      <div className="split-layout-left" style={{ flex: 1, padding: '4rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative' }}>
+        
+        {/* Background Animation */}
         <motion.div 
           animate={{ rotate: 360 }} 
           transition={{ duration: 100, repeat: Infinity, ease: 'linear' }}
@@ -122,7 +133,7 @@ const Login = ({ onLogin }) => {
       </div>
 
       {/* Right Side - Glass Login Form */}
-      <div style={{ flex: 1, backgroundColor: 'var(--color-light-gray)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+      <div className="split-layout-right" style={{ flex: 1, backgroundColor: 'var(--color-light-gray)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
         <motion.div 
           initial={{ x: 50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -235,6 +246,7 @@ const Login = ({ onLogin }) => {
         </motion.div>
       </div>
     </div>
+    </>
   );
 };
 

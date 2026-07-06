@@ -99,6 +99,11 @@ a {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Split Layouts (Login, Onboarding) */
+.mobile-padding {
+  padding: 1.5rem 1rem !important;
+}
+
 /* Layout */
 .app-container {
   display: flex;
@@ -123,6 +128,91 @@ a {
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 2rem;
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 500px;
+  overflow-y: auto;
+  max-height: 85vh;
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    position: fixed !important;
+    top: 0;
+    left: -300px;
+    height: 100vh;
+    z-index: 1050;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+    backdrop-filter: blur(2px);
+  }
+
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+  
+  .search-bar {
+    display: none !important; /* Hide search bar on mobile to save space in Navbar */
+  }
+
+  .topbar {
+    padding: 0.75rem 1rem !important;
+    height: 60px !important;
+  }
+
+  .page-content {
+    padding: 1rem !important;
+    height: calc(100vh - 60px) !important;
+  }
+  
+  .modal-overlay {
+    padding: 1rem !important;
+    align-items: flex-end !important;
+  }
+  
+  .modal-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 90vh !important;
+    margin: 0 !important;
+    border-radius: 20px 20px 0 0 !important;
+  }
 }
 
 /* Sidebar */

@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Ticket, Laptop, Users, ChevronsRight, Settings, BookOpen } from 'lucide-react';
 
-const Sidebar = ({ user }) => {
+const Sidebar = ({ user, isOpen }) => {
   const location = useLocation();
   const role = user?.role || 'Employee';
   const companyName = user?.companyName || 'Intec';
@@ -26,7 +26,7 @@ const Sidebar = ({ user }) => {
   navItems.push({ name: 'Settings', path: '/settings', icon: <Settings size={22} /> });
 
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-header" style={{ justifyContent: 'center' }}>
         <div className="sidebar-logo">
           <div style={{ background: 'var(--color-azure)', color: 'white', padding: '0.2rem 0.6rem', borderRadius: '8px', fontSize: '1rem', fontWeight: 700 }}>{companyName}</div>
