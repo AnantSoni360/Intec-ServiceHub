@@ -213,6 +213,49 @@ a {
     margin: 0 !important;
     border-radius: 20px 20px 0 0 !important;
   }
+
+  /* Landing Page Specific */
+  .landing-nav {
+    padding: 0 1rem !important;
+  }
+  .landing-nav-links {
+    display: none !important;
+  }
+  .landing-hero {
+    padding: 120px 1.5rem 60px !important;
+    flex-direction: column !important;
+    text-align: center;
+    gap: 2rem !important;
+  }
+  .landing-hero-h1 {
+    font-size: 2.5rem !important;
+  }
+  .landing-hero-p {
+    font-size: 1.1rem !important;
+  }
+  .landing-hero-buttons {
+    flex-direction: column !important;
+  }
+  .landing-hero-buttons .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .landing-hero-image {
+    display: none !important;
+  }
+  .landing-section {
+    padding: 4rem 1.5rem !important;
+  }
+  .landing-section-title {
+    font-size: 2.2rem !important;
+  }
+  .landing-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .landing-solution-row {
+    flex-direction: column !important;
+    gap: 3rem !important;
+  }
 }
 
 /* Sidebar */

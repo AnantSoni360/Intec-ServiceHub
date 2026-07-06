@@ -25,12 +25,12 @@ const Landing = () => {
       </div>
 
       {/* Navbar */}
-      <nav className="glass" style={{ position: 'fixed', top: 0, width: '100%', height: '80px', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4rem' }}>
+      <nav className="glass landing-nav" style={{ position: 'fixed', top: 0, width: '100%', height: '80px', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4rem' }}>
         <a href="#home" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
           <img src="/logo.png" alt="Intec ServiceHub Logo" style={{ height: '36px', borderRadius: '8px' }} />
           <span style={{ color: 'var(--color-navy)', fontWeight: '800', fontSize: '1.5rem', fontFamily: 'var(--font-heading)' }}>ServiceHub</span>
         </a>
-        <div style={{ display: 'flex', gap: '2.5rem', fontWeight: '500', color: 'var(--color-text-main)' }}>
+        <div className="landing-nav-links" style={{ display: 'flex', gap: '2.5rem', fontWeight: '500', color: 'var(--color-text-main)' }}>
           <a href="#features" className="hover-link" style={{ cursor: 'pointer', transition: 'color 0.2s' }}>Features</a>
           <a href="#solutions" className="hover-link" style={{ cursor: 'pointer', transition: 'color 0.2s' }}>Solutions</a>
           <a href="#about" className="hover-link" style={{ cursor: 'pointer', transition: 'color 0.2s' }}>About</a>
@@ -45,7 +45,7 @@ const Landing = () => {
       <div style={{ position: 'relative', zIndex: 10 }}>
         
         {/* Hero Section */}
-        <section id="home" style={{ paddingTop: '180px', paddingBottom: '120px', paddingLeft: '4rem', paddingRight: '4rem', display: 'flex', gap: '4rem', alignItems: 'center', maxWidth: '1400px', margin: '0 auto', minHeight: '100vh' }}>
+        <section id="home" className="landing-hero" style={{ paddingTop: '180px', paddingBottom: '120px', paddingLeft: '4rem', paddingRight: '4rem', display: 'flex', gap: '4rem', alignItems: 'center', maxWidth: '1400px', margin: '0 auto', minHeight: '100vh' }}>
           {/* Text */}
           <motion.div 
             initial={{ opacity: 0, y: 50 }}
@@ -56,14 +56,14 @@ const Landing = () => {
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(37,99,235,0.1)', color: 'var(--color-azure)', padding: '0.5rem 1rem', borderRadius: '999px', fontWeight: '600', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
                v2.0 Now Available
             </div>
-            <h1 style={{ fontSize: '4.5rem', lineHeight: '1.1', marginBottom: '1.5rem', color: 'var(--color-navy)' }}>
+            <h1 className="landing-hero-h1" style={{ fontSize: '4.5rem', lineHeight: '1.1', marginBottom: '1.5rem', color: 'var(--color-navy)' }}>
               Manage IT Operations<br/>
               <span style={{ color: 'transparent', backgroundImage: 'linear-gradient(90deg, var(--color-azure), #8B5CF6)', WebkitBackgroundClip: 'text', backgroundClip: 'text' }}>Smarter. Faster.</span>
             </h1>
-            <p style={{ fontSize: '1.25rem', color: 'var(--color-text-muted)', marginBottom: '2.5rem', maxWidth: '600px', lineHeight: '1.8' }}>
+            <p className="landing-hero-p" style={{ fontSize: '1.25rem', color: 'var(--color-text-muted)', marginBottom: '2.5rem', maxWidth: '600px', lineHeight: '1.8' }}>
               The unified Enterprise IT Service Desk & Asset Management Platform designed for modern organizations. Resolve issues faster and keep your team productive.
             </p>
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <div className="landing-hero-buttons" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
               <Link to="/onboarding" className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.1rem', borderRadius: '999px', boxShadow: '0 10px 25px -5px rgba(37,99,235,0.4)' }}>
                 Start Free Trial <ChevronRight size={20} />
               </Link>
@@ -89,6 +89,7 @@ const Landing = () => {
             initial={{ opacity: 0, x: 100 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
+            className="landing-hero-image"
             style={{ flex: 1, position: 'relative', height: '600px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
           >
             <div style={{ position: 'relative', width: '100%', height: '100%', perspective: '1000px' }}>
@@ -132,11 +133,11 @@ const Landing = () => {
         </section>
 
         {/* Features Section */}
-        <section id="features" style={{ padding: '8rem 4rem', backgroundColor: 'white', borderTop: '1px solid var(--color-gray-border)' }}>
+        <section id="features" className="landing-section" style={{ padding: '8rem 4rem', backgroundColor: 'white', borderTop: '1px solid var(--color-gray-border)' }}>
           <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: '5rem', maxWidth: '800px', margin: '0 auto 5rem auto' }}>
-              <div style={{ color: 'var(--color-azure)', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '1rem' }}>Capabilities</div>
-              <h2 style={{ fontSize: '3rem', color: 'var(--color-navy)', lineHeight: '1.2' }}>Everything you need to run a flawless IT operation.</h2>
+            <div style={{ textAlign: 'center', marginBottom: '5rem' }}>
+              <div style={{ color: '#2563EB', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '1rem' }}>Features</div>
+              <h2 className="landing-section-title" style={{ fontSize: '3rem', color: 'var(--color-navy)' }}>Everything you need, in one place</h2>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2.5rem' }}>
@@ -169,15 +170,15 @@ const Landing = () => {
         </section>
 
         {/* Solutions Section */}
-        <section id="solutions" style={{ padding: '8rem 4rem', backgroundColor: '#F8FAFC' }}>
+        <section id="solutions" className="landing-section" style={{ padding: '8rem 4rem', backgroundColor: '#F8FAFC' }}>
           <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '6rem' }}>
               <div style={{ color: '#8B5CF6', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '1rem' }}>Solutions</div>
-              <h2 style={{ fontSize: '3rem', color: 'var(--color-navy)' }}>Built for modern workflows</h2>
+              <h2 className="landing-section-title" style={{ fontSize: '3rem', color: 'var(--color-navy)' }}>Built for modern workflows</h2>
             </div>
 
             {/* Solution 1 */}
-            <div style={{ display: 'flex', gap: '6rem', alignItems: 'center', marginBottom: '8rem' }}>
+            <div className="landing-solution-row" style={{ display: 'flex', gap: '6rem', alignItems: 'center', marginBottom: '8rem' }}>
               <motion.div 
                 initial={{ opacity: 0, x: -50 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -218,7 +219,7 @@ const Landing = () => {
             </div>
 
             {/* Solution 2 */}
-            <div style={{ display: 'flex', gap: '6rem', alignItems: 'center', flexDirection: 'row-reverse' }}>
+            <div className="landing-solution-row" style={{ display: 'flex', gap: '6rem', alignItems: 'center', flexDirection: 'row-reverse' }}>
               <motion.div 
                 initial={{ opacity: 0, x: 50 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -261,17 +262,17 @@ const Landing = () => {
         </section>
 
         {/* About / Stats Section */}
-        <section id="about" style={{ padding: '8rem 4rem', backgroundColor: 'var(--color-navy)', color: 'white' }}>
+        <section id="about" className="landing-section" style={{ padding: '8rem 4rem', backgroundColor: 'var(--color-navy)', color: 'white', position: 'relative', overflow: 'hidden' }}>
           <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '5rem', maxWidth: '800px', margin: '0 auto 5rem auto' }}>
               <div style={{ color: '#60A5FA', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '1rem' }}>Our Mission</div>
-              <h2 style={{ fontSize: '3rem', color: 'white', lineHeight: '1.2', marginBottom: '1.5rem' }}>Empowering IT teams to focus on innovation, not administration.</h2>
+              <h2 className="landing-section-title" style={{ fontSize: '3rem', color: 'white', lineHeight: '1.2', marginBottom: '1.5rem' }}>Empowering IT teams to focus on innovation, not administration.</h2>
               <p style={{ fontSize: '1.25rem', color: '#93C5FD', lineHeight: '1.8' }}>
                 Since our founding, we've believed that robust IT service management shouldn't require months of deployment and clunky interfaces. ServiceHub is designed for speed, flexibility, and a beautiful user experience.
               </p>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2rem' }}>
+            <div className="landing-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2.5rem' }}>
               {[
                 { value: '99.9%', label: 'Uptime SLA' },
                 { value: '10k+', label: 'Active Users' },
@@ -308,8 +309,8 @@ const Landing = () => {
         </section>
 
         {/* Footer */}
-        <footer style={{ backgroundColor: '#0F172A', color: '#94A3B8', padding: '5rem 4rem 2rem 4rem' }}>
-          <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '4rem', marginBottom: '4rem' }}>
+        <footer className="landing-section" style={{ backgroundColor: '#0F172A', color: '#94A3B8', padding: '5rem 4rem 2rem 4rem' }}>
+          <div className="landing-grid" style={{ maxWidth: '1400px', margin: '0 auto', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '4rem', marginBottom: '4rem' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
                 <img src="/logo.png" alt="Intec ServiceHub Logo" style={{ height: '36px', borderRadius: '8px', filter: 'brightness(0) invert(1)' }} />
