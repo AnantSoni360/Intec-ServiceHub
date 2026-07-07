@@ -22,51 +22,46 @@ export default function Onboarding() {
   const [assetsFile, setAssetsFile] = useState(null);
   const [ticketsFile, setTicketsFile] = useState(null);
 
-  const [token, setToken] = useState(null);
-
   const handleRegister = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`${API_URL}/onboarding/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ companyName, userName, email, password })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Registration failed');
-      
-      setToken(data.token);
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      setStep(2);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    // Validate inputs locally, API call deferred to Step 3
+    if (!companyName || !userName || !email || !password) {
+      setError('Please fill in all details.');
+      return;
     }
+    setError(null);
+    setStep(2);
   };
 
   const handleUpload = async (e) => {
     e.preventDefault();
+    if (!usersFile || !assetsFile || !ticketsFile) {
+      setError('All three CSV files are mandatory.');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
       const formData = new FormData();
-      if (usersFile) formData.append('users', usersFile);
-      if (assetsFile) formData.append('assets', assetsFile);
-      if (ticketsFile) formData.append('tickets', ticketsFile);
+      formData.append('companyName', companyName);
+      formData.append('userName', userName);
+      formData.append('email', email);
+      formData.append('password', password);
+      
+      formData.append('users', usersFile);
+      formData.append('assets', assetsFile);
+      formData.append('tickets', ticketsFile);
 
-      const res = await fetch(`${API_URL}/onboarding/upload-data`, {
+      const res = await fetch(`${API_URL}/onboarding/register-and-upload`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token || localStorage.getItem('token')}`
-        },
         body: formData
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Upload failed');
+      if (!res.ok) throw new Error(data.message || 'Workspace creation failed');
+      
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
       
       setStep(4);
     } catch (err) {
@@ -174,7 +169,7 @@ export default function Onboarding() {
                 </div>
 
                 <button type="submit" disabled={loading} className="btn btn-primary" style={{ width: '100%', padding: '1rem', marginTop: '1rem', fontSize: '1.1rem' }}>
-                  {loading ? <Loader2 className="animate-spin" size={24} /> : 'Create Workspace'}
+                  Next Step <ChevronRight size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginLeft: '0.5rem' }} />
                 </button>
               </motion.form>
             )}
@@ -187,7 +182,7 @@ export default function Onboarding() {
                   </div>
                   <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Download Data Templates</h3>
                   <p style={{ color: 'var(--color-text-muted)', fontSize: '1rem' }}>
-                    To import your existing data, please download these CSV templates and fill them out with your company's information.
+                    To import your existing data, please download these CSV templates and fill them out with your company's information. <strong>This is mandatory.</strong>
                   </p>
                 </div>
 
@@ -215,8 +210,7 @@ export default function Onboarding() {
                   </a>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
-                  <button onClick={() => setStep(3)} style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500 }}>Skip for now</button>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: '1rem' }}>
                   <button onClick={() => setStep(3)} className="btn btn-primary" style={{ padding: '0.75rem 1.5rem' }}>
                     Next Step <ChevronRight size={18} />
                   </button>
@@ -232,29 +226,28 @@ export default function Onboarding() {
                   </div>
                   <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Upload Your Data</h3>
                   <p style={{ color: 'var(--color-text-muted)', fontSize: '1rem' }}>
-                    Upload the completed CSV templates to populate your workspace. You can skip any files you don't have yet.
+                    Upload the completed CSV templates to populate your workspace and finalize your account creation. <strong>All files are required.</strong>
                   </p>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--color-text-main)' }}>Users (users.csv)</label>
-                    <input type="file" accept=".csv" onChange={(e) => setUsersFile(e.target.files[0])} style={{ width: '100%', padding: '0.5rem', border: '1px dashed var(--color-gray-border)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--color-light-gray)' }} />
+                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--color-text-main)' }}>Users (users.csv) *</label>
+                    <input type="file" required accept=".csv" onChange={(e) => setUsersFile(e.target.files[0])} style={{ width: '100%', padding: '0.5rem', border: '1px dashed var(--color-gray-border)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--color-light-gray)' }} />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--color-text-main)' }}>Assets (assets.csv)</label>
-                    <input type="file" accept=".csv" onChange={(e) => setAssetsFile(e.target.files[0])} style={{ width: '100%', padding: '0.5rem', border: '1px dashed var(--color-gray-border)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--color-light-gray)' }} />
+                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--color-text-main)' }}>Assets (assets.csv) *</label>
+                    <input type="file" required accept=".csv" onChange={(e) => setAssetsFile(e.target.files[0])} style={{ width: '100%', padding: '0.5rem', border: '1px dashed var(--color-gray-border)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--color-light-gray)' }} />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--color-text-main)' }}>Tickets (tickets.csv)</label>
-                    <input type="file" accept=".csv" onChange={(e) => setTicketsFile(e.target.files[0])} style={{ width: '100%', padding: '0.5rem', border: '1px dashed var(--color-gray-border)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--color-light-gray)' }} />
+                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--color-text-main)' }}>Tickets (tickets.csv) *</label>
+                    <input type="file" required accept=".csv" onChange={(e) => setTicketsFile(e.target.files[0])} style={{ width: '100%', padding: '0.5rem', border: '1px dashed var(--color-gray-border)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--color-light-gray)' }} />
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
-                  <button type="button" onClick={() => setStep(4)} style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500 }}>Skip upload</button>
-                  <button type="submit" disabled={loading || (!usersFile && !assetsFile && !ticketsFile)} className="btn btn-primary" style={{ padding: '0.75rem 1.5rem' }}>
-                    {loading ? <Loader2 className="animate-spin" size={20} /> : 'Upload Data'}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: '1rem' }}>
+                  <button type="submit" disabled={loading || !usersFile || !assetsFile || !ticketsFile} className="btn btn-primary" style={{ padding: '0.75rem 1.5rem', opacity: (!usersFile || !assetsFile || !ticketsFile) ? 0.5 : 1 }}>
+                    {loading ? <Loader2 className="animate-spin" size={20} /> : 'Create Workspace & Upload'}
                   </button>
                 </div>
               </motion.form>
@@ -273,7 +266,7 @@ export default function Onboarding() {
                 <div>
                   <h3 style={{ fontSize: '2rem', marginBottom: '1rem', color: 'var(--color-navy)' }}>You're all set!</h3>
                   <p style={{ color: 'var(--color-text-muted)', fontSize: '1.1rem', maxWidth: '400px', margin: '0 auto' }}>
-                    Your workspace is ready. You can now access your dashboard and manage your company's operations.
+                    Your workspace is created and your data is successfully uploaded. You can now access your dashboard.
                   </p>
                 </div>
                 <button onClick={handleFinish} className="btn btn-primary" style={{ padding: '1rem 3rem', fontSize: '1.1rem', marginTop: '1rem' }}>
