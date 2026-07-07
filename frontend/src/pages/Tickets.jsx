@@ -653,6 +653,7 @@ const Tickets = ({ user }) => {
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="card modal-content" 
+            style={{ maxHeight: '90vh', overflowY: 'auto' }}
           >
             <h2 className="card-title" style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>Raise a Ticket</h2>
             <form onSubmit={handleCreateTicket}>

@@ -81,24 +81,32 @@ router.post('/register-and-upload', upload.fields([{ name: 'users' }, { name: 'a
     // Add super admin to map
     userMapByEmail[email] = newUser._id;
     
+    const tempPassword = await bcrypt.hash('password123', 10);
     const rawUsers = await parseCSV(req.files['users'][0].path);
     for (const u of rawUsers) {
-      const existing = await User.findOne({ email: u.Email });
-      if (!existing && u.Email !== email) {
-        const tempPassword = await bcrypt.hash('password123', 10);
+      // Handle potential BOM or casing issues in headers
+      const rowEmail = (u.Email || u.email || u[' Email'] || '').trim();
+      const rowName = (u.Name || u.name || '').trim();
+      const rowRole = (u.Role || u.role || '').trim();
+      const rowDept = (u.Department || u.department || '').trim();
+
+      if (!rowEmail || !rowName) continue; // Skip invalid rows
+
+      const existing = await User.findOne({ email: rowEmail });
+      if (!existing && rowEmail !== email) {
         const csvUser = new User({
-          name: u.Name,
-          email: u.Email,
+          name: rowName,
+          email: rowEmail,
           password: tempPassword,
-          role: u.Role === 'IT Engineer' ? 'Engineer' : (u.Role === 'IT Manager' ? 'Admin' : u.Role),
-          department: u.Department,
+          role: rowRole === 'IT Engineer' ? 'Engineer' : (rowRole === 'IT Manager' ? 'Admin' : rowRole),
+          department: rowDept,
           companyId
         });
         await csvUser.save();
-        userMapByEmail[u.Email] = csvUser._id;
+        userMapByEmail[rowEmail] = csvUser._id;
         usersCount++;
       } else if (existing) {
-        userMapByEmail[u.Email] = existing._id;
+        userMapByEmail[rowEmail] = existing._id;
       }
     }
 
@@ -106,32 +114,49 @@ router.post('/register-and-upload', upload.fields([{ name: 'users' }, { name: 'a
     const assetMapBySerialNumber = {};
     const rawAssets = await parseCSV(req.files['assets'][0].path);
     for (const a of rawAssets) {
-      const assignedTo = userMapByEmail[a.Assigned_To_Email] || null;
+      const assignedEmail = (a.Assigned_To_Email || a.assigned_to_email || a['Assigned To Email'] || '').trim();
+      const assetName = (a.Asset_Name || a.asset_name || a['Asset Name'] || '').trim();
+      const assetType = (a.Asset_Type || a.asset_type || a['Asset Type'] || 'Other').trim();
+      const serial = (a.Serial_Number || a.serial_number || a['Serial Number'] || '').trim();
+      const status = (a.Status || a.status || 'Available').trim();
+
+      if (!assetName || !serial) continue;
+
+      const assignedTo = userMapByEmail[assignedEmail] || null;
       const newAsset = new Asset({
-        name: a.Asset_Name,
-        type: a.Asset_Type,
-        serialNumber: a.Serial_Number,
-        status: a.Status,
+        name: assetName,
+        type: assetType,
+        serialNumber: serial,
+        status: status,
         assignedTo,
         companyId
       });
       await newAsset.save();
-      assetMapBySerialNumber[a.Serial_Number] = newAsset._id;
+      assetMapBySerialNumber[serial] = newAsset._id;
       assetsCount++;
     }
 
     // Process Tickets
     const rawTickets = await parseCSV(req.files['tickets'][0].path);
     for (const t of rawTickets) {
-      const requestedBy = userMapByEmail[t.Requested_By_Email];
-      const assignedTo = userMapByEmail[t.Assigned_To_Email] || null;
+      const reqEmail = (t.Requested_By_Email || t.requested_by_email || t['Requested By Email'] || '').trim();
+      const assEmail = (t.Assigned_To_Email || t.assigned_to_email || t['Assigned To Email'] || '').trim();
+      const title = (t.Title || t.title || '').trim();
+      const desc = (t.Description || t.description || '').trim();
+      const priority = (t.Priority || t.priority || 'Medium').trim();
+      const status = (t.Status || t.status || 'Open').trim();
+
+      if (!title || !reqEmail) continue;
+
+      const requestedBy = userMapByEmail[reqEmail];
+      const assignedTo = userMapByEmail[assEmail] || null;
       
       if (requestedBy) {
         const newTicket = new Ticket({
-          title: t.Title,
-          description: t.Description,
-          priority: t.Priority === 'Critical' ? 'High' : t.Priority,
-          status: (t.Status === 'Closed' || t.Status === 'Cancelled') ? 'Resolved' : t.Status,
+          title: title,
+          description: desc,
+          priority: priority === 'Critical' ? 'High' : priority,
+          status: (status === 'Closed' || status === 'Cancelled') ? 'Resolved' : status,
           requestedBy,
           assignedTo,
           companyId
