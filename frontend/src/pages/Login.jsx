@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Network, Eye, EyeOff } from 'lucide-react';
+import { Network, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { GoogleLogin } from '@react-oauth/google';
 
 const Login = ({ onLogin }) => {
@@ -90,6 +90,15 @@ const Login = ({ onLogin }) => {
             {error}
           </motion.div>
         )}
+      </div>
+
+      <div style={{ position: 'fixed', top: 20, left: 20, zIndex: 1000 }}>
+        <button 
+          onClick={() => navigate('/website')}
+          style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'white', padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', backdropFilter: 'blur(10px)' }}
+        >
+          <ArrowLeft size={16} /> Go back to website
+        </button>
       </div>
       
       <div className="split-layout" style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--color-navy)', overflow: 'hidden' }}>

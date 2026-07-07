@@ -87,7 +87,8 @@ function App() {
     <Router>
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={!user ? <Landing /> : <Navigate to="/dashboard" />} />
+        <Route path="/website" element={!user ? <Landing /> : <Navigate to="/dashboard" />} />
+        <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={!user ? <Login onLogin={handleLogin} /> : <Navigate to="/dashboard" />} />
         <Route path="/onboarding" element={!user ? <Onboarding /> : <Navigate to="/dashboard" />} />
 
