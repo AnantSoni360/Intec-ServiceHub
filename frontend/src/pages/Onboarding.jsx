@@ -192,21 +192,21 @@ export default function Onboarding() {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  <a href={`${API_URL.replace('/api', '')}/data_templates/users.csv`} download style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem', border: '1px solid var(--color-gray-border)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--color-white)', transition: 'all 0.2s ease', cursor: 'pointer', textDecoration: 'none' }} className="hover:shadow-md">
+                  <a href={`${API_URL.replace('/api', '')}/data_templates/users.csv`} download target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem', border: '1px solid var(--color-gray-border)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--color-white)', transition: 'all 0.2s ease', cursor: 'pointer', textDecoration: 'none' }} className="hover:shadow-md">
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                       <span style={{ fontWeight: 600, color: 'var(--color-navy)' }}>Users Template</span>
                       <span style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>users.csv</span>
                     </div>
                     <Download size={20} color="var(--color-azure)" />
                   </a>
-                  <a href={`${API_URL.replace('/api', '')}/data_templates/assets.csv`} download style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem', border: '1px solid var(--color-gray-border)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--color-white)', transition: 'all 0.2s ease', cursor: 'pointer', textDecoration: 'none' }}>
+                  <a href={`${API_URL.replace('/api', '')}/data_templates/assets.csv`} download target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem', border: '1px solid var(--color-gray-border)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--color-white)', transition: 'all 0.2s ease', cursor: 'pointer', textDecoration: 'none' }}>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                       <span style={{ fontWeight: 600, color: 'var(--color-navy)' }}>Assets Template</span>
                       <span style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>assets.csv</span>
                     </div>
                     <Download size={20} color="var(--color-azure)" />
                   </a>
-                  <a href={`${API_URL.replace('/api', '')}/data_templates/tickets.csv`} download style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem', border: '1px solid var(--color-gray-border)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--color-white)', transition: 'all 0.2s ease', cursor: 'pointer', textDecoration: 'none' }}>
+                  <a href={`${API_URL.replace('/api', '')}/data_templates/tickets.csv`} download target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem', border: '1px solid var(--color-gray-border)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--color-white)', transition: 'all 0.2s ease', cursor: 'pointer', textDecoration: 'none' }}>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                       <span style={{ fontWeight: 600, color: 'var(--color-navy)' }}>Tickets Template</span>
                       <span style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>tickets.csv</span>

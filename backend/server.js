@@ -70,7 +70,7 @@ const onboardingRoutes = require('./routes/onboarding');
 const adminRoutes = require('./routes/admin');
 
 // Serve data templates for onboarding
-app.use('/data_templates', express.static(path.join(__dirname, '../data_templates')));
+app.use('/data_templates', express.static(path.join(__dirname, 'data_templates')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/tickets', ticketRoutes);
