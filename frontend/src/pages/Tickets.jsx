@@ -37,7 +37,7 @@ const Tickets = ({ user }) => {
   }, [user, searchQuery, statusFilter, priorityFilter, categoryFilter, sortBy, currentPage]);
 
   useEffect(() => {
-    if (user.role === 'Admin' || user.role === 'Engineer') {
+    if (user.role === 'Admin' || user.role === 'super_admin' || user.role === 'Engineer') {
       fetchUsers();
     }
   }, [user]);
@@ -68,7 +68,7 @@ const Tickets = ({ user }) => {
 
   const fetchTickets = async () => {
     try {
-      const endpoint = (user.role === 'Admin' || user.role === 'Engineer') 
+      const endpoint = (user.role === 'Admin' || user.role === 'super_admin' || user.role === 'Engineer') 
         ? `${import.meta.env.VITE_API_URL}/tickets` 
         : `${import.meta.env.VITE_API_URL}/tickets/user/${user.id}`;
       
@@ -248,7 +248,7 @@ const Tickets = ({ user }) => {
 
   const exportCSV = async () => {
     try {
-      const endpoint = (user.role === 'Admin' || user.role === 'Engineer') 
+      const endpoint = (user.role === 'Admin' || user.role === 'super_admin' || user.role === 'Engineer') 
         ? `${import.meta.env.VITE_API_URL}/tickets` 
         : `${import.meta.env.VITE_API_URL}/tickets/user/${user.id}`;
       
@@ -287,7 +287,7 @@ const Tickets = ({ user }) => {
 
   const exportPDF = async () => {
     try {
-      const endpoint = (user.role === 'Admin' || user.role === 'Engineer') 
+      const endpoint = (user.role === 'Admin' || user.role === 'super_admin' || user.role === 'Engineer') 
         ? `${import.meta.env.VITE_API_URL}/tickets` 
         : `${import.meta.env.VITE_API_URL}/tickets/user/${user.id}`;
       
@@ -364,7 +364,7 @@ const Tickets = ({ user }) => {
             >
               <FileText size={14} /> View Details
             </button>
-            {user.role === 'Admin' && (
+            {(user.role === 'Admin' || user.role === 'super_admin') && (
               <button 
                 className="menu-action-btn"
                 style={{ width: '100%', textAlign: 'left', padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'none', border: 'none', cursor: 'pointer', borderRadius: '4px', fontSize: '0.875rem' }}
@@ -487,7 +487,7 @@ const Tickets = ({ user }) => {
           <table>
           <thead>
             <tr>
-              {(user.role === 'Admin' || user.role === 'Engineer') && (
+              {(user.role === 'Admin' || user.role === 'super_admin' || user.role === 'Engineer') && (
                 <th style={{ width: '40px', paddingRight: 0 }}>
                   <input 
                     type="checkbox" 
@@ -520,7 +520,7 @@ const Tickets = ({ user }) => {
                 onMouseEnter={e => { if (!selectedTicketIds.includes(t.id)) e.currentTarget.style.backgroundColor = 'var(--color-light-gray)' }}
                 onMouseLeave={e => { if (!selectedTicketIds.includes(t.id)) e.currentTarget.style.backgroundColor = 'transparent' }}
               >
-                {(user.role === 'Admin' || user.role === 'Engineer') && (
+                {(user.role === 'Admin' || user.role === 'super_admin' || user.role === 'Engineer') && (
                   <td style={{ paddingRight: 0 }} onClick={e => e.stopPropagation()}>
                     <input 
                       type="checkbox" 
@@ -609,7 +609,7 @@ const Tickets = ({ user }) => {
               <button className="btn" style={{ color: 'var(--color-white)', backgroundColor: 'rgba(255,255,255,0.1)' }} onClick={() => handleBulkUpdate({ status: 'In Progress' })}>
                 Mark In Progress
               </button>
-              {user.role === 'Admin' && (
+              {(user.role === 'Admin' || user.role === 'super_admin') && (
                 <button className="btn" style={{ color: '#fca5a5', backgroundColor: 'rgba(239,68,68,0.2)' }} onClick={handleBulkDelete}>
                   Delete
                 </button>
