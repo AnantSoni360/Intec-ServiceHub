@@ -245,12 +245,6 @@ const Login = ({ onLogin }) => {
               <p style={{ marginBottom: '1rem', fontSize: '0.9rem' }}>
                 Don't have a portal yet? <span onClick={() => navigate('/onboarding')} style={{ color: 'var(--color-azure)', cursor: 'pointer', fontWeight: '600' }}>Create a new Company Portal</span>
               </p>
-              <p style={{ marginBottom: '0.5rem', fontWeight: '600' }}>Demo Accounts Available:</p>
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                <span className="badge badge-neutral">karan.nair8@intec-demo.com (Employee)</span>
-                <span className="badge badge-neutral">rohan.gowda1@intec-demo.com (Engineer)</span>
-                <span className="badge badge-neutral">kavita.reddy@intec-demo.com (Admin)</span>
-              </div>
             </div>
         </motion.div>
       </div>
