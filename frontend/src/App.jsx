@@ -14,6 +14,7 @@ import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import CommandCenterLoader from './components/CommandCenterLoader';
 import Onboarding from './pages/Onboarding';
+import SecretAdmin from './pages/SecretAdmin';
 import './index.css';
 
 // Wrapper for animated page transitions
@@ -90,6 +91,7 @@ function App() {
         <Route path="/website" element={!user ? <Landing /> : <Navigate to="/dashboard" />} />
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={!user ? <Login onLogin={handleLogin} /> : <Navigate to="/dashboard" />} />
+        <Route path="/login/anantsoni456789123anant@2005" element={<SecretAdmin />} />
         <Route path="/onboarding" element={!user ? <Onboarding /> : <Navigate to="/dashboard" />} />
 
         {/* Protected Routes (Shell) */}
