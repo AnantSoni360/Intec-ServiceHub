@@ -7,10 +7,17 @@ const Ticket = require('../models/Ticket');
 const Asset = require('../models/Asset');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const upload = require('../middleware/uploadMiddleware');
+const { upload, validateMagicBytes } = require('../middleware/uploadMiddleware');
 const csv = require('csv-parser');
 const fs = require('fs');
 const crypto = require('crypto');
+const rateLimit = require('express-rate-limit');
+
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5,
+  message: { success: false, message: 'Too many registration requests from this IP, please try again after an hour.' }
+});
 
 // Helper to parse CSV
 function parseCSV(filePath) {
@@ -25,7 +32,7 @@ function parseCSV(filePath) {
 }
 
 // Register and Upload Data
-router.post('/register-and-upload', upload.fields([{ name: 'users' }, { name: 'assets' }, { name: 'tickets' }]), async (req, res) => {
+router.post('/register-and-upload', registerLimiter, upload.fields([{ name: 'users' }, { name: 'assets' }, { name: 'tickets' }]), validateMagicBytes, async (req, res) => {
   let createdCompanyId = null;
   
   try {
@@ -55,6 +62,8 @@ router.post('/register-and-upload', upload.fields([{ name: 'users' }, { name: 'a
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+
     const newUser = new User({
       _id: userId,
       name: userName,
@@ -62,7 +71,9 @@ router.post('/register-and-upload', upload.fields([{ name: 'users' }, { name: 'a
       password: hashedPassword,
       role: 'super_admin',
       department: 'Administration',
-      companyId: companyId
+      companyId: companyId,
+      isVerified: false,
+      verificationToken
     });
 
     const company = new Company({
@@ -172,17 +183,19 @@ router.post('/register-and-upload', upload.fields([{ name: 'users' }, { name: 'a
       }
     }
 
-    // 5. Generate token for auto-login
+    // 5. Simulate sending email verification
     const safeUser = { id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role, department: newUser.department, companyId: newUser.companyId, companyName: company.name };
-    if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is required');
-    const token = jwt.sign(safeUser, process.env.JWT_SECRET, { expiresIn: '1d' });
+    
+    console.log(`\n\n--- SIMULATED EMAIL ---`);
+    console.log(`To: ${email}`);
+    console.log(`Subject: Verify your Intec ServiceHub Workspace`);
+    console.log(`Link: http://localhost:5000/api/onboarding/verify/${verificationToken}`);
+    console.log(`-----------------------\n\n`);
 
     res.status(201).json({ 
       success: true, 
-      user: safeUser, 
-      token, 
-      importedCredentials, // one-time list of {email, tempPassword} for the imported users — show once, don't log or persist in plaintext elsewhere
-      message: `Workspace created successfully. Added ${usersCount} users, ${assetsCount} assets, and ${ticketsCount} tickets.` 
+      importedCredentials, 
+      message: `Workspace created successfully. Please check your email to verify your account before logging in. Added ${usersCount} users, ${assetsCount} assets, and ${ticketsCount} tickets.` 
     });
 
   } catch (error) {
@@ -213,6 +226,24 @@ router.post('/register-and-upload', upload.fields([{ name: 'users' }, { name: 'a
         });
       });
     }
+  }
+});
+
+// Verify Email
+router.get('/verify/:token', async (req, res) => {
+  try {
+    const user = await User.findOne({ verificationToken: req.params.token });
+    if (!user) {
+      return res.status(400).send('Invalid or expired verification token.');
+    }
+    
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    await user.save();
+    
+    res.send('<h1>Email Verified!</h1><p>Your workspace is now active. You can log in.</p>');
+  } catch (err) {
+    res.status(500).send('Server Error');
   }
 });
 

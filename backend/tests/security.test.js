@@ -55,10 +55,20 @@ describe('Security and Hardening Tests', () => {
 
   describe('Rate Limiting on Registration', () => {
     it('should rate limit after 5 requests', async () => {
+      const makeRequest = () => request(app)
+        .post('/api/onboarding/register-and-upload')
+        .field('companyName', 'Test Corp ' + Math.random())
+        .field('userName', 'Test User')
+        .field('email', 'test' + Math.random() + '@test.com')
+        .field('password', 'password123')
+        .attach('users', Buffer.from('Email,Name\ntest@test.com,Test'), 'users.csv')
+        .attach('assets', Buffer.from('Asset Name,Serial Number\nLaptop,123'), 'assets.csv')
+        .attach('tickets', Buffer.from('Title,Requested By Email\nFix,test@test.com'), 'tickets.csv');
+
       for (let i = 0; i < 5; i++) {
-        await request(app).post('/api/onboarding/register-and-upload').send({});
+        await makeRequest();
       }
-      const res = await request(app).post('/api/onboarding/register-and-upload').send({});
+      const res = await makeRequest();
       expect(res.statusCode).toEqual(429); // Too Many Requests
     });
   });
