@@ -79,10 +79,10 @@ app.use('/api/assets', assetRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Global error handler for Pino structured logging
+// Error handling middleware
 app.use((err, req, res, next) => {
   logger.error(err);
-  res.status(500).json({ message: err.message || 'Server Error' });
+  res.status(500).json({ message: 'Server Error' });
 });
 
 const PORT = process.env.PORT || 5000;
