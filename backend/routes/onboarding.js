@@ -10,6 +10,15 @@ const jwt = require('jsonwebtoken');
 const upload = require('../middleware/uploadMiddleware');
 const csv = require('csv-parser');
 const fs = require('fs');
+const crypto = require('crypto');
+const rateLimit = require('express-rate-limit');
+const fileType = require('file-type');
+
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5, // limit each IP to 5 registration requests per windowMs
+  message: { success: false, message: 'Too many registration requests from this IP, please try again after an hour.' }
+});
 
 // Helper to parse CSV
 function parseCSV(filePath) {
@@ -24,7 +33,7 @@ function parseCSV(filePath) {
 }
 
 // Register and Upload Data
-router.post('/register-and-upload', upload.fields([{ name: 'users' }, { name: 'assets' }, { name: 'tickets' }]), async (req, res) => {
+router.post('/register-and-upload', registerLimiter, upload.fields([{ name: 'users' }, { name: 'assets' }, { name: 'tickets' }]), async (req, res) => {
   let createdCompanyId = null;
   
   try {
@@ -33,6 +42,17 @@ router.post('/register-and-upload', upload.fields([{ name: 'users' }, { name: 'a
     // 1. Validate mandatory files
     if (!req.files || !req.files['users'] || !req.files['assets'] || !req.files['tickets']) {
       return res.status(400).json({ success: false, message: 'All three CSV files (users, assets, tickets) are mandatory.' });
+    }
+
+    // 1.5. Validate magic bytes (prevent malicious executable spoofing)
+    for (const key of ['users', 'assets', 'tickets']) {
+      for (const file of req.files[key]) {
+        const type = await fileType.fromFile(file.path);
+        // fileType returns undefined for text files like CSV. If it detects an executable or binary, it's dangerous.
+        if (type && type.mime !== 'application/csv' && type.mime !== 'text/csv' && !type.mime.startsWith('text/')) {
+          return res.status(400).json({ success: false, message: `File validation failed for ${file.originalname}. Suspected binary content.` });
+        }
+      }
     }
 
     // 2. Check if user or company already exists
@@ -54,6 +74,8 @@ router.post('/register-and-upload', upload.fields([{ name: 'users' }, { name: 'a
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+
     const newUser = new User({
       _id: userId,
       name: userName,
@@ -61,7 +83,9 @@ router.post('/register-and-upload', upload.fields([{ name: 'users' }, { name: 'a
       password: hashedPassword,
       role: 'super_admin',
       department: 'Administration',
-      companyId: companyId
+      companyId: companyId,
+      isVerified: false,
+      verificationToken
     });
 
     const company = new Company({
@@ -81,7 +105,6 @@ router.post('/register-and-upload', upload.fields([{ name: 'users' }, { name: 'a
     // Add super admin to map
     userMapByEmail[email] = newUser._id;
     
-    const tempPassword = await bcrypt.hash('password123', 10);
     const rawUsers = await parseCSV(req.files['users'][0].path);
     for (const u of rawUsers) {
       // Handle potential BOM or casing issues in headers
@@ -94,10 +117,12 @@ router.post('/register-and-upload', upload.fields([{ name: 'users' }, { name: 'a
 
       const existing = await User.findOne({ email: rowEmail });
       if (!existing && rowEmail !== email) {
+        // Generate random password for CSV users
+        const randPass = crypto.randomBytes(6).toString('hex');
         const csvUser = new User({
           name: rowName,
           email: rowEmail,
-          password: tempPassword,
+          password: await bcrypt.hash(randPass, 10),
           role: rowRole === 'IT Engineer' ? 'Engineer' : (rowRole === 'IT Manager' ? 'Admin' : rowRole),
           department: rowDept,
           companyId
@@ -168,14 +193,17 @@ router.post('/register-and-upload', upload.fields([{ name: 'users' }, { name: 'a
 
     // 5. Generate token for auto-login
     const safeUser = { id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role, department: newUser.department, companyId: newUser.companyId, companyName: company.name };
-    if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is required');
-    const token = jwt.sign(safeUser, process.env.JWT_SECRET, { expiresIn: '1d' });
+    
+    // Simulate sending email
+    console.log(`\n\n--- SIMULATED EMAIL ---`);
+    console.log(`To: ${email}`);
+    console.log(`Subject: Verify your Intec ServiceHub Workspace`);
+    console.log(`Link: http://localhost:5000/api/onboarding/verify/${verificationToken}`);
+    console.log(`-----------------------\n\n`);
 
     res.status(201).json({ 
       success: true, 
-      user: safeUser, 
-      token, 
-      message: `Workspace created successfully. Added ${usersCount} users, ${assetsCount} assets, and ${ticketsCount} tickets.` 
+      message: `Workspace created successfully. Please check your email to verify your account before logging in. Added ${usersCount} users, ${assetsCount} assets, and ${ticketsCount} tickets.` 
     });
 
   } catch (error) {
@@ -206,6 +234,24 @@ router.post('/register-and-upload', upload.fields([{ name: 'users' }, { name: 'a
         });
       });
     }
+  }
+});
+
+// Verify Email
+router.get('/verify/:token', async (req, res) => {
+  try {
+    const user = await User.findOne({ verificationToken: req.params.token });
+    if (!user) {
+      return res.status(400).send('Invalid or expired verification token.');
+    }
+    
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    await user.save();
+    
+    res.send('<h1>Email Verified!</h1><p>Your workspace is now active. You can log in.</p>');
+  } catch (err) {
+    res.status(500).send('Server Error');
   }
 });
 
