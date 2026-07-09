@@ -2,6 +2,7 @@ const request = require('supertest');
 const express = require('express');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
+const bcrypt = require('bcryptjs');
 const adminRoutes = require('../routes/admin');
 const onboardingRoutes = require('../routes/onboarding');
 
@@ -18,7 +19,7 @@ beforeAll(async () => {
   await mongoose.connect(uri);
   process.env.JWT_SECRET = 'test_secret';
   process.env.PLATFORM_ADMIN_EMAIL = 'admin@example.com';
-  process.env.PLATFORM_ADMIN_PASSWORD = 'supersecret';
+  process.env.PLATFORM_ADMIN_PASSWORD_HASH = await bcrypt.hash('supersecret', 10);
 });
 
 afterAll(async () => {
