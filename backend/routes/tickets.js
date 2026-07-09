@@ -7,7 +7,7 @@ const Ticket = require('../models/Ticket');
 const User = require('../models/User');
 const authMiddleware = require('../middleware/authMiddleware');
 const requireRole = require('../middleware/roleMiddleware');
-const upload = require('../middleware/uploadMiddleware');
+const { upload } = require('../middleware/uploadMiddleware');
 const { sendEmail } = require('../utils/email');
 
 router.use(authMiddleware);
