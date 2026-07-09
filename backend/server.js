@@ -7,6 +7,7 @@ const pino = require('pino');
 const pinoHttp = require('pino-http');
 
 const app = express();
+app.set('trust proxy', 1);
 
 const logger = pino({
   level: process.env.LOG_LEVEL || 'info',
