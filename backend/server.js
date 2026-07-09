@@ -81,8 +81,8 @@ app.use('/api/admin', adminRoutes);
 
 // Global error handler for Pino structured logging
 app.use((err, req, res, next) => {
-  req.log.error(err);
-  res.status(500).json({ message: 'Server Error' });
+  logger.error(err);
+  res.status(500).json({ message: err.message || 'Server Error' });
 });
 
 const PORT = process.env.PORT || 5000;
