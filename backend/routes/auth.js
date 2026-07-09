@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const Company = require('../models/Company');
-const AuditLog = require('../models/AuditLog');
 
 // Get all companies (public)
 router.get('/companies', async (req, res) => {
@@ -28,10 +27,7 @@ router.post('/login', async (req, res) => {
     if (user) {
       const isMatch = await bcrypt.compare(password, user.password);
       if (isMatch) {
-        if (user.isVerified === false) {
-          return res.status(403).json({ success: false, message: 'Please verify your email address before logging in.' });
-        }
-        const safeUser = { id: user._id, name: user.name, email: user.email, role: user.role, department: user.department, companyId: user.companyId._id, companyName: user.companyId?.name, tokenVersion: user.tokenVersion || 0 };
+        const safeUser = { id: user._id, name: user.name, email: user.email, role: user.role, department: user.department, companyId: user.companyId._id, companyName: user.companyId?.name, mustChangePassword: !!user.mustChangePassword };
         const jwt = require('jsonwebtoken');
         if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is required');
         const token = jwt.sign(safeUser, process.env.JWT_SECRET, { expiresIn: '1d' });
@@ -66,7 +62,7 @@ router.post('/google', async (req, res) => {
     if (!companyId) return res.status(400).json({ success: false, message: 'Company selection is required' });
     const user = await User.findOne({ email, companyId }).populate('companyId');
     if (user) {
-      const safeUser = { id: user._id, name: user.name, email: user.email, role: user.role, department: user.department, companyId: user.companyId._id, companyName: user.companyId?.name, tokenVersion: user.tokenVersion || 0 };
+      const safeUser = { id: user._id, name: user.name, email: user.email, role: user.role, department: user.department, companyId: user.companyId._id, companyName: user.companyId?.name };
       const jwt = require('jsonwebtoken');
       if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is required');
       const serverToken = jwt.sign(safeUser, process.env.JWT_SECRET, { expiresIn: '1d' });
@@ -110,7 +106,7 @@ router.post('/change-password', authMiddleware, async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(newPassword, salt);
-    user.tokenVersion = (user.tokenVersion || 0) + 1;
+    user.mustChangePassword = false;
     await user.save();
 
     res.json({ success: true, message: 'Password updated successfully' });
@@ -182,17 +178,7 @@ router.post('/users/:id/reset-password', authMiddleware, requireRole('Admin', 's
     const crypto = require('crypto');
     const tempPassword = crypto.randomBytes(6).toString('hex');
     user.password = await bcrypt.hash(tempPassword, 10);
-    user.tokenVersion = (user.tokenVersion || 0) + 1;
     await user.save();
-
-    if (AuditLog && AuditLog.create) {
-      await AuditLog.create({
-        actor: req.user.email,
-        action: 'RESET_PASSWORD',
-        target: user.email
-      });
-    }
-
     res.json({ message: 'Password reset successfully', tempPassword });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });

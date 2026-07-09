@@ -7,9 +7,7 @@ const userSchema = new mongoose.Schema({
   role: { type: String, required: true, enum: ['Employee', 'Engineer', 'Admin', 'super_admin'] },
   department: { type: String, required: true },
   companyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', required: true },
-  tokenVersion: { type: Number, default: 0 },
-  isVerified: { type: Boolean, default: false },
-  verificationToken: { type: String }
+  mustChangePassword: { type: Boolean, default: false }
 }, { timestamps: true });
 
 // Ensure email is unique per company
