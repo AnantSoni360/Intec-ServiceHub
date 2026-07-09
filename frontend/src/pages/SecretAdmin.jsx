@@ -4,24 +4,37 @@ import { ArrowLeft, Trash2 } from 'lucide-react';
 
 const SecretAdmin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [token, setToken] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [companies, setCompanies] = useState([]);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (email === 'anantsoni@gmail.com' && password === '[REDACTED]') {
-      setIsAuthenticated(true);
-      fetchCompanies();
-    } else {
-      alert('Invalid credentials');
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setToken(data.token);
+        setIsAuthenticated(true);
+      } else {
+        alert(data.message || 'Invalid credentials');
+      }
+    } catch (err) {
+      alert('Error during login');
     }
   };
 
   const fetchCompanies = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/companies`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/companies`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       const data = await response.json();
       if (data.success) {
         setCompanies(data.data);
@@ -31,22 +44,32 @@ const SecretAdmin = () => {
     }
   };
 
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      fetchCompanies();
+    }
+  }, [isAuthenticated, token]);
+
   const handleDelete = async (id, name) => {
-    if (window.confirm(`Are you sure you want to completely delete ${name} and ALL its data?`)) {
+    const userInput = window.prompt(`DANGER: To completely delete this company and ALL its data, please type the company name exactly as shown: "${name}"`);
+    if (userInput === name) {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/companies/${id}`, {
-          method: 'DELETE'
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
         if (data.success) {
           alert('Deleted successfully');
           fetchCompanies();
         } else {
-          alert('Failed to delete');
+          alert(data.message || 'Failed to delete');
         }
       } catch (err) {
         alert('Error deleting');
       }
+    } else if (userInput !== null) {
+      alert('Company name did not match. Deletion aborted.');
     }
   };
 
