@@ -139,7 +139,7 @@ router.post('/users', authMiddleware, requireRole('Admin', 'super_admin'), async
     const tempPassword = crypto.randomBytes(6).toString('hex'); // 12 characters
 
     const password = await bcrypt.hash(tempPassword, 10);
-    const user = new User({ name, email, password, role, department, companyId: req.user.companyId });
+    const user = new User({ name, email, password, role, department, companyId: req.user.companyId, isVerified: true });
     await user.save();
 
     res.status(201).json({ id: user._id, name: user.name, email: user.email, role: user.role, department: user.department, tempPassword });

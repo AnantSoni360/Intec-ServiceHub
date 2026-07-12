@@ -116,7 +116,8 @@ router.post('/register-and-upload', registerLimiter, upload.fields([{ name: 'use
           role: rowRole === 'IT Engineer' ? 'Engineer' : (rowRole === 'IT Manager' ? 'Admin' : rowRole),
           department: rowDept,
           companyId,
-          mustChangePassword: true
+          mustChangePassword: true,
+          isVerified: true
         });
         await csvUser.save();
         userMapByEmail[rowEmail] = csvUser._id;
