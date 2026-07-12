@@ -22,7 +22,8 @@ async function seed() {
         password: hashedPassword,
         role: 'super_admin',
         department: 'Management',
-        companyId: new mongoose.Types.ObjectId() // temporary
+        companyId: new mongoose.Types.ObjectId(), // temporary
+        isVerified: true
       });
       await superAdmin.save();
 
@@ -52,7 +53,8 @@ async function seed() {
         await User.create({
           ...u,
           password: hashedPassword,
-          companyId: company._id
+          companyId: company._id,
+          isVerified: true
         });
         console.log(`Created demo user: ${u.email}`);
       } else {

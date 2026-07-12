@@ -55,7 +55,8 @@ async function seedDatabase() {
         password: defaultPassword,
         role: u.role,
         department: u.department,
-        companyId: company._id
+        companyId: company._id,
+        isVerified: true
       }));
 
     if (newUsersToInsert.length > 0) {
