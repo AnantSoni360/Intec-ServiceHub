@@ -60,8 +60,8 @@ export default function Onboarding() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Workspace creation failed');
       
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      // Auto-login is no longer supported since email verification is required.
+      // Do NOT set localStorage here.
       
       setStep(4);
     } catch (err) {
@@ -72,7 +72,7 @@ export default function Onboarding() {
   };
 
   const handleFinish = () => {
-    window.location.href = '/dashboard';
+    window.location.href = '/login';
   };
 
   const slideVariants = {
@@ -266,11 +266,11 @@ export default function Onboarding() {
                 <div>
                   <h3 style={{ fontSize: '2rem', marginBottom: '1rem', color: 'var(--color-navy)' }}>You're all set!</h3>
                   <p style={{ color: 'var(--color-text-muted)', fontSize: '1.1rem', maxWidth: '400px', margin: '0 auto' }}>
-                    Your workspace is created and your data is successfully uploaded. You can now access your dashboard.
+                    Your workspace is created and your data is successfully uploaded. Please check your email to verify your account before logging in.
                   </p>
                 </div>
                 <button onClick={handleFinish} className="btn btn-primary" style={{ padding: '1rem 3rem', fontSize: '1.1rem', marginTop: '1rem' }}>
-                  Go to Dashboard
+                  Go to Login
                 </button>
               </motion.div>
             )}
